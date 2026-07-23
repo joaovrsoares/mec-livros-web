@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import sharp from "sharp";
 import { getProxyCoverUrl } from "./mec-api";
+import { normalizeCoverUrl } from "./cover-cache";
 
 test("getProxyCoverUrl wraps static-meclivros cover URLs", () => {
   const input = "https://static-meclivros.mec.gov.br/covers/9786587140315.jpg";
@@ -9,22 +10,22 @@ test("getProxyCoverUrl wraps static-meclivros cover URLs", () => {
   assert.equal(getProxyCoverUrl(input), expected);
 });
 
-test("sharp detects magic bytes and converts mislabeled AVIF cover image to WebP", async () => {
-  const sampleUrl = "https://static-meclivros.mec.gov.br/covers/9786587140315.jpg";
+test("normalizeCoverUrl converts /covers/ to /covers-webp/", () => {
+  const input = "https://static-meclivros.mec.gov.br/covers/9786587140315.jpg";
+  const expected = "https://static-meclivros.mec.gov.br/covers-webp/9786587140315.jpg";
+  assert.equal(normalizeCoverUrl(input), expected);
+});
+
+test("covers-webp endpoint returns native webp format", async () => {
+  const sampleUrl = normalizeCoverUrl("https://static-meclivros.mec.gov.br/covers/9786587140315.jpg");
   const response = await fetch(sampleUrl);
   assert.equal(response.status, 200);
 
+  const contentType = response.headers.get("content-type");
+  assert.equal(contentType, "image/webp");
+
   const arrayBuf = await response.arrayBuffer();
   const buffer = Buffer.from(arrayBuf);
-
-  // Verify sharp inspects buffer metadata (format: heif / compression: av1)
   const metadata = await sharp(buffer).metadata();
-  assert.ok(metadata.format === "heif" || metadata.format === "jpeg" || metadata.format === "png" || metadata.format === "webp");
-
-  // Verify converting to webp produces valid webp buffer
-  const webpBuffer = await sharp(buffer).toFormat("webp").toBuffer();
-  assert.ok(webpBuffer.length > 0);
-
-  const webpMetadata = await sharp(webpBuffer).metadata();
-  assert.equal(webpMetadata.format, "webp");
+  assert.equal(metadata.format, "webp");
 });

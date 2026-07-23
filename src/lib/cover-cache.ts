@@ -8,18 +8,40 @@ type CachedCover = {
 const coverCache = new Map<string, CachedCover>();
 const MAX_CACHE_SIZE = 500;
 
+export function normalizeCoverUrl(url: string): string {
+  if (url && url.includes("static-meclivros.mec.gov.br/covers/")) {
+    return url.replace(
+      "static-meclivros.mec.gov.br/covers/",
+      "static-meclivros.mec.gov.br/covers-webp/"
+    );
+  }
+  return url;
+}
+
 export async function processAndCacheCover(targetUrl: string): Promise<CachedCover | null> {
+  const fetchUrl = normalizeCoverUrl(targetUrl);
+
   if (coverCache.has(targetUrl)) {
     return coverCache.get(targetUrl)!;
   }
 
   try {
-    const upstreamRes = await fetch(targetUrl, {
+    let upstreamRes = await fetch(fetchUrl, {
       headers: {
         "User-Agent": "MecLivrosWeb/1.0",
       },
       next: { revalidate: 86400 },
     });
+
+    if (!upstreamRes.ok && fetchUrl !== targetUrl) {
+      // Fallback to original URL if covers-webp fails
+      upstreamRes = await fetch(targetUrl, {
+        headers: {
+          "User-Agent": "MecLivrosWeb/1.0",
+        },
+        next: { revalidate: 86400 },
+      });
+    }
 
     if (!upstreamRes.ok) {
       return null;
