@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Front-end MVP do MEC Livros em [Next.js](https://nextjs.org), com:
 
-## Getting Started
+- busca pública de livros;
+- paginação (12 itens por página);
+- página de detalhes por livro;
+- endpoint backend para baixar e descriptografar o EPUB.
 
-First, run the development server:
+## Configuração
+
+1. Copie as variáveis de ambiente:
+
+```bash
+cp .env.example .env.local
+```
+
+2. Preencha `MEC_LIVROS_BEARER_TOKEN` em `.env.local`.
+
+### Rate limit de download (antiabuso)
+
+O endpoint de download descriptografado possui limitador por cliente (IP):
+
+- `MEC_DOWNLOAD_SHORT_WINDOW_SECONDS` (padrão: `45`)
+- `MEC_DOWNLOAD_SHORT_WINDOW_MAX` (padrão: `1`)
+- `MEC_DOWNLOAD_DAILY_MAX` (padrão: `25`)
+
+Com os padrões acima, você pode baixar com calma ao longo do dia, mas evita rajadas e abuso.
+
+## Rodando localmente
+
+Primeiro, instale dependências:
+
+```bash
+npm install
+```
+
+Depois, suba o servidor:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Rotas principais
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` busca e lista de livros (6 colunas x 2 linhas por página).
+- `/livro/[id]` detalhes do livro e botão de download do EPUB descriptografado.
 
-## Learn More
+## Endpoint interno de download
 
-To learn more about Next.js, take a look at the following resources:
+`GET /api/books/[id]/download-decrypted`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Esse endpoint:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. gera URL temporária do EPUB criptografado via API autenticada;
+2. baixa o arquivo da AWS;
+3. descriptografa arquivos `.xhtml` e `.html` no EPUB;
+4. devolve o `.epub` processado para o cliente.
 
-## Deploy on Vercel
+## Segurança
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Nunca exponha o Bearer token no front-end.
+- Use somente no backend (`.env.local`).

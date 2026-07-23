@@ -1,0 +1,99 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 16px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.backLink {
+  color: #0a5ddb;
+  font-weight: 600;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+}
+
+.coverWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f1f4fb;
+}
+
+.cover {
+  object-fit: cover;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-size: 2rem;
+}
+
+.author {
+  font-size: 1.1rem;
+  color: #4f556d;
+  margin-bottom: 8px;
+}
+
+.meta {
+  font-size: 0.96rem;
+}
+
+.actions {
+  margin-top: 12px;
+}
+
+.downloadButton,
+.disabledButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 0 16px;
+  font-weight: 600;
+}
+
+.downloadButton {
+  background: #0a5ddb;
+  color: #fff;
+}
+
+.disabledButton {
+  background: #e5e8f0;
+  color: #66708a;
+}
+
+.descriptionBlock {
+  background: #fff;
+  border: 1px solid #e8ebf5;
+  border-radius: 12px;
+  padding: 16px;
+  line-height: 1.55;
+}
+
+.descriptionBlock h2 {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .coverWrap {
+    max-width: 340px;
+  }
+}
