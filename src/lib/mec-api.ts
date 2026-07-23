@@ -94,3 +94,12 @@ export async function getDownloadInfo(
   });
 }
 
+export function getProxyCoverUrl(rawUrl: string): string {
+  if (!rawUrl) return "";
+  if (rawUrl.startsWith("https://static-meclivros.mec.gov.br/")) {
+    return `/api/cover-proxy?url=${encodeURIComponent(rawUrl)}`;
+  }
+  return rawUrl;
+}
+
+

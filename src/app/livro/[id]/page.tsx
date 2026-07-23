@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 
 import styles from "./page.module.css";
 import DownloadButton from "@/components/DownloadButton";
-import { getBookById } from "@/lib/mec-api";
+import { getBookById, getProxyCoverUrl } from "@/lib/mec-api";
+import { preloadBookCovers } from "@/lib/cover-cache";
 
 type BookDetailsProps = {
   params: Promise<{
@@ -36,6 +37,9 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
   let book;
   try {
     book = await getBookById(id);
+    if (book?.cover_filename) {
+      await preloadBookCovers([book.cover_filename]);
+    }
   } catch {
     notFound();
   }
@@ -49,7 +53,7 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
       <section className={styles.content}>
         <div className={styles.coverWrap}>
           <Image
-            src={book.cover_filename}
+            src={getProxyCoverUrl(book.cover_filename)}
             alt={`Capa de ${book.title}`}
             fill
             sizes="(max-width: 900px) 60vw, 300px"
