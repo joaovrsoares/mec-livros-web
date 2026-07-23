@@ -9,12 +9,14 @@ type DownloadButtonProps = {
   hasEpub?: boolean;
 };
 
+type DownloadType = "epub" | "pdf";
+
 export default function DownloadButton({
   bookId,
   bookTitle,
   hasEpub = true,
 }: DownloadButtonProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingType, setLoadingType] = useState<DownloadType | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
@@ -38,19 +40,26 @@ export default function DownloadButton({
     return (
       <div className={styles.container}>
         <button disabled className={styles.downloadBtn}>
-          Este título não possui EPUB
+          Este título não possui EPUB / PDF
         </button>
       </div>
     );
   }
 
-  async function handleDownload() {
-    setIsLoading(true);
+  async function handleDownload(type: DownloadType) {
+    setLoadingType(type);
     setErrorMessage(null);
     setSuccessMessage(null);
 
+    const endpoint =
+      type === "pdf"
+        ? `/api/books/${bookId}/download-pdf`
+        : `/api/books/${bookId}/download-decrypted`;
+
+    const defaultExt = type === "pdf" ? "pdf" : "epub";
+
     try {
-      const response = await fetch(`/api/books/${bookId}/download-decrypted`);
+      const response = await fetch(endpoint);
 
       if (response.status === 429) {
         const retryAfterHeader = response.headers.get("Retry-After");
@@ -61,7 +70,7 @@ export default function DownloadButton({
         setErrorMessage(
           `Limite de downloads atingido. Por favor, aguarde ${validSeconds} segundo(s) para tentar novamente.`
         );
-        setIsLoading(false);
+        setLoadingType(null);
         return;
       }
 
@@ -72,9 +81,8 @@ export default function DownloadButton({
         );
       }
 
-      // Read Content-Disposition filename if available
       const disposition = response.headers.get("Content-Disposition");
-      let filename = `${bookTitle}.epub`;
+      let filename = `${bookTitle}.${defaultExt}`;
       if (disposition && disposition.includes("filename=")) {
         const match = disposition.match(/filename="?([^"]+)"?/);
         if (match && match[1]) {
@@ -92,7 +100,7 @@ export default function DownloadButton({
       link.remove();
       window.URL.revokeObjectURL(downloadUrl);
 
-      setSuccessMessage("Download concluído com sucesso!");
+      setSuccessMessage(`Download de ${type.toUpperCase()} concluído com sucesso!`);
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err) {
       const msg =
@@ -101,27 +109,47 @@ export default function DownloadButton({
           : "Não foi possível baixar o livro. Tente novamente mais tarde.";
       setErrorMessage(msg);
     } finally {
-      setIsLoading(false);
+      setLoadingType(null);
     }
   }
+
+  const isAnyLoading = loadingType !== null;
 
   return (
     <div className={styles.container}>
       <button
-        onClick={handleDownload}
-        disabled={isLoading || countdown > 0}
+        onClick={() => handleDownload("epub")}
+        disabled={isAnyLoading || countdown > 0}
         className={styles.downloadBtn}
-        aria-busy={isLoading}
+        aria-busy={loadingType === "epub"}
       >
-        {isLoading ? (
+        {loadingType === "epub" ? (
           <>
             <span className={styles.spinner} aria-hidden="true" />
-            <span>Processando EPUB...</span>
+            <span>Descriptografando EPUB...</span>
           </>
         ) : countdown > 0 ? (
           `Aguarde ${countdown}s`
         ) : (
           "Baixar EPUB descriptografado"
+        )}
+      </button>
+
+      <button
+        onClick={() => handleDownload("pdf")}
+        disabled={isAnyLoading || countdown > 0}
+        className={`${styles.downloadBtn} ${styles.pdfBtn}`}
+        aria-busy={loadingType === "pdf"}
+      >
+        {loadingType === "pdf" ? (
+          <>
+            <span className={styles.spinner} aria-hidden="true" />
+            <span>Gerando PDF A4...</span>
+          </>
+        ) : countdown > 0 ? (
+          `Aguarde ${countdown}s`
+        ) : (
+          "Baixar PDF (Formatado A4)"
         )}
       </button>
 

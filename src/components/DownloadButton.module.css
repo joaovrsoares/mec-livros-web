@@ -42,6 +42,14 @@
   box-shadow: none;
 }
 
+.pdfBtn {
+  background-color: #dc2626;
+}
+
+.pdfBtn:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
 .spinner {
   width: 18px;
   height: 18px;
