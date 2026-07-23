@@ -1,5 +1,5 @@
 # Stage 1: Base image
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Install Chromium and font dependencies for PDF rendering in Alpine Linux
 RUN apk add --no-cache \
