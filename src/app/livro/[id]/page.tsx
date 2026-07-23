@@ -13,7 +13,7 @@ type BookDetailsProps = {
   }>;
 };
 
-function formatDate(value: string): string {
+function formatDate(value?: string): string {
   if (!value) {
     return "Não informado";
   }

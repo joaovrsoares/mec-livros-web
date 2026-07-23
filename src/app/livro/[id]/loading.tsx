@@ -1,83 +1,33 @@
+import Link from "next/link";
 import styles from "./page.module.css";
 
-export default function BookLoading() {
+export default function BookDetailsLoading() {
   return (
     <main className={styles.page}>
-      <div
-        style={{
-          width: 120,
-          height: 20,
-          backgroundColor: "#e2e8f0",
-          borderRadius: 4,
-          marginBottom: "1.5rem",
-        }}
-      />
+      <Link href="/" className={styles.backLink}>
+        ← Voltar para busca
+      </Link>
+
       <section className={styles.content}>
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 300,
-            height: 400,
-            backgroundColor: "#e2e8f0",
-            borderRadius: 8,
-          }}
-        />
-        <div className={styles.details} style={{ width: "100%" }}>
-          <div
-            style={{
-              width: "70%",
-              height: 32,
-              backgroundColor: "#e2e8f0",
-              borderRadius: 6,
-              marginBottom: 12,
-            }}
-          />
-          <div
-            style={{
-              width: "40%",
-              height: 20,
-              backgroundColor: "#e2e8f0",
-              borderRadius: 4,
-              marginBottom: 24,
-            }}
-          />
-          <div
-            style={{
-              width: "50%",
-              height: 16,
-              backgroundColor: "#e2e8f0",
-              borderRadius: 4,
-              marginBottom: 12,
-            }}
-          />
-          <div
-            style={{
-              width: "60%",
-              height: 16,
-              backgroundColor: "#e2e8f0",
-              borderRadius: 4,
-              marginBottom: 12,
-            }}
-          />
-          <div
-            style={{
-              width: "35%",
-              height: 16,
-              backgroundColor: "#e2e8f0",
-              borderRadius: 4,
-              marginBottom: 24,
-            }}
-          />
-          <div
-            style={{
-              width: "100%",
-              maxWidth: 300,
-              height: 48,
-              backgroundColor: "#cbd5e1",
-              borderRadius: 8,
-            }}
-          />
+        <div className={styles.coverWrapSkeleton} />
+
+        <div className={styles.details}>
+          <div className={styles.titleSkeleton} />
+          <div className={styles.authorSkeleton} />
+          <div className={styles.metaSkeleton} />
+          <div className={styles.metaSkeleton} style={{ width: "40%" }} />
+          <div className={styles.metaSkeleton} style={{ width: "30%" }} />
+          <div className={styles.metaSkeleton} style={{ width: "35%" }} />
+          <div className={styles.metaSkeleton} style={{ width: "50%" }} />
+          <div className={styles.buttonSkeleton} />
         </div>
+      </section>
+
+      <section className={styles.descriptionBlock}>
+        <h2>Descrição</h2>
+        <div className={styles.descriptionSkeleton} style={{ width: "100%" }} />
+        <div className={styles.descriptionSkeleton} style={{ width: "95%" }} />
+        <div className={styles.descriptionSkeleton} style={{ width: "80%" }} />
       </section>
     </main>
   );

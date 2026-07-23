@@ -1,7 +1,9 @@
 .page {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 32px 16px 56px;
+  padding: 32px 24px 56px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -95,5 +97,73 @@
 
   .coverWrap {
     max-width: 340px;
+  }
+}
+
+.coverWrapSkeleton {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #eef2f9 25%, #e2e8f5 50%, #eef2f9 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+}
+
+.titleSkeleton {
+  height: 32px;
+  width: 75%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef2f9 25%, #e2e8f5 50%, #eef2f9 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  margin-bottom: 8px;
+}
+
+.authorSkeleton {
+  height: 20px;
+  width: 45%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eef2f9 25%, #e2e8f5 50%, #eef2f9 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  margin-bottom: 12px;
+}
+
+.metaSkeleton {
+  height: 16px;
+  width: 55%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eef2f9 25%, #e2e8f5 50%, #eef2f9 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  margin-bottom: 8px;
+}
+
+.buttonSkeleton {
+  height: 44px;
+  width: 160px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #eef2f9 25%, #e2e8f5 50%, #eef2f9 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  margin-top: 12px;
+}
+
+.descriptionSkeleton {
+  height: 16px;
+  width: 90%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eef2f9 25%, #e2e8f5 50%, #eef2f9 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }

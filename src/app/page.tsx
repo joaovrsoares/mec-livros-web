@@ -2,12 +2,25 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import styles from "./page.module.css";
-import { searchBooks, getProxyCoverUrl, type MecBook, type MecSearchResponse } from "@/lib/mec-api";
+import {
+  searchBooks,
+  getCategoriesPreview,
+  getCategoryBooks,
+  getProxyCoverUrl,
+  formatHomepageTitle,
+  formatHomepageAuthors,
+  type MecBook,
+  type MecSearchResponse,
+  type MecCategory,
+  type MecCategoryBooksResponse,
+} from "@/lib/mec-api";
 import { preloadBookCovers } from "@/lib/cover-cache";
+import CategorySlider from "@/components/CategorySlider";
 
 type HomeProps = {
   searchParams: Promise<{
     query?: string;
+    category?: string;
     page?: string;
   }>;
 };
@@ -54,7 +67,8 @@ function buildQueryHref(query: string, page: number): string {
 }
 
 function BookCard({ book, priority = false }: { book: MecBook; priority?: boolean }) {
-  const author = book.authors?.join(", ") || "Autor desconhecido";
+  const title = formatHomepageTitle(book.title);
+  const author = formatHomepageAuthors(book.authors);
   return (
     <Link href={`/livro/${book.id}`} className={styles.card}>
       <div className={styles.coverWrap}>
@@ -67,7 +81,7 @@ function BookCard({ book, priority = false }: { book: MecBook; priority?: boolea
           priority={priority}
         />
       </div>
-      <h3 className={styles.cardTitle}>{book.title}</h3>
+      <h3 className={styles.cardTitle}>{title}</h3>
       <p className={styles.cardAuthor}>{author}</p>
     </Link>
   );
@@ -76,6 +90,7 @@ function BookCard({ book, priority = false }: { book: MecBook; priority?: boolea
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
   const query = params.query?.trim() ?? "";
+  const categoryParam = params.category?.trim() ?? "";
   const page = parsePage(params.page);
   const directBookId = query ? extractBookId(query) : null;
 
@@ -83,7 +98,13 @@ export default async function Home({ searchParams }: HomeProps) {
     redirect(`/livro/${directBookId}`);
   }
 
+  // Fetch category preview list
+  const categoriesData = await getCategoriesPreview().catch(() => null);
+  const categoriesList: MecCategory[] =
+    categoriesData?.sections?.flatMap((section) => section.categories) ?? [];
+
   let searchResult: MecSearchResponse | null = null;
+  let categoryResult: MecCategoryBooksResponse | null = null;
   let errorMessage = "";
 
   if (query) {
@@ -98,13 +119,44 @@ export default async function Home({ searchParams }: HomeProps) {
           ? error.message
           : "Não foi possível carregar os resultados da busca.";
     }
+  } else {
+    // Default to 'ficcao-literaria' if no category query param is passed
+    const selectedSlug = categoryParam || "ficcao-literaria";
+    try {
+      categoryResult = await getCategoryBooks({ slug: selectedSlug, page: 1, limit: 11 });
+      if (categoryResult?.books?.length) {
+        await preloadBookCovers(categoryResult.books.map((b) => b.cover_filename));
+      }
+    } catch (error) {
+      if (categoriesList.length > 0 && selectedSlug !== categoriesList[0].slug) {
+        try {
+          categoryResult = await getCategoryBooks({
+            slug: categoriesList[0].slug,
+            page: 1,
+            limit: 11,
+          });
+          if (categoryResult?.books?.length) {
+            await preloadBookCovers(categoryResult.books.map((b) => b.cover_filename));
+          }
+        } catch {
+          errorMessage = "Não foi possível carregar as recomendações de livros.";
+        }
+      } else {
+        errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar as recomendações de livros.";
+      }
+    }
   }
+
+  const activeCategorySlug = categoryParam || (categoryResult?.slug ?? "ficcao-literaria");
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <section
-          className={`${styles.hero} ${searchResult ? styles.heroWithResults : styles.heroCentered}`}
+          className={`${styles.hero} ${searchResult || categoryResult ? styles.heroWithResults : styles.heroCentered}`}
         >
           <h1 className={styles.srOnly}>MEC Livros</h1>
           <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
@@ -123,7 +175,7 @@ export default async function Home({ searchParams }: HomeProps) {
               type="search"
               name="query"
               defaultValue={query}
-              placeholder="Pesquise"
+              placeholder="Pesquise por título, autor, URL ou ID"
               className={styles.searchInput}
               required
             />
@@ -132,16 +184,11 @@ export default async function Home({ searchParams }: HomeProps) {
             </button>
           </form>
 
-          {!query && (
-            <p className={styles.infoMessage}>
-              Você pode buscar por título, autor, URL ou ID.
-            </p>
-          )}
-
           {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
         </section>
 
-        {searchResult && (
+        {/* Text Search Results (Grid with pagination) */}
+        {searchResult && searchResult.books.length > 0 && (
           <>
             <p className={styles.resultsSummary}>
               Busca: <strong>{searchResult.query}</strong> •{" "}
@@ -154,20 +201,20 @@ export default async function Home({ searchParams }: HomeProps) {
               ))}
             </section>
 
-            <nav className={styles.pagination} aria-label="Paginação">
-              {searchResult.pagination.has_previous_page ? (
-                <Link
-                  className={styles.pageButton}
-                  href={buildQueryHref(query, page - 1)}
-                >
-                  Anterior
-                </Link>
-              ) : (
-                <span className={styles.pageButtonDisabled}>Anterior</span>
-              )}
+            {searchResult.pagination.total_pages > 1 && (
+              <nav className={styles.pagination} aria-label="Paginação">
+                {searchResult.pagination.has_previous_page ? (
+                  <Link
+                    className={styles.pageButton}
+                    href={buildQueryHref(query, page - 1)}
+                  >
+                    Anterior
+                  </Link>
+                ) : (
+                  <span className={styles.pageButtonDisabled}>Anterior</span>
+                )}
 
-              {paginationItems(page, searchResult.pagination.total_pages).map(
-                (pageItem) => (
+                {paginationItems(page, searchResult.pagination.total_pages).map((pageItem) => (
                   <Link
                     key={pageItem}
                     href={buildQueryHref(query, pageItem)}
@@ -179,18 +226,32 @@ export default async function Home({ searchParams }: HomeProps) {
                   >
                     {pageItem}
                   </Link>
-                ),
-              )}
+                ))}
 
-              {searchResult.pagination.has_next_page ? (
-                <Link className={styles.pageButton} href={buildQueryHref(query, page + 1)}>
-                  Próxima
-                </Link>
-              ) : (
-                <span className={styles.pageButtonDisabled}>Próxima</span>
-              )}
-            </nav>
+                {searchResult.pagination.has_next_page ? (
+                  <Link
+                    className={styles.pageButton}
+                    href={buildQueryHref(query, page + 1)}
+                  >
+                    Próxima
+                  </Link>
+                ) : (
+                  <span className={styles.pageButtonDisabled}>Próxima</span>
+                )}
+              </nav>
+            )}
           </>
+        )}
+
+        {/* Home Recommendations (Category Slider of 12 books + Inline Dropdown) */}
+        {!query && categoryResult && categoryResult.books.length > 0 && (
+          <CategorySlider
+            books={categoryResult.books}
+            categorySlug={categoryResult.slug}
+            categoryName={categoryResult.name}
+            categories={categoriesList}
+            activeSlug={activeCategorySlug}
+          />
         )}
       </main>
     </div>

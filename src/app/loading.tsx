@@ -9,14 +9,12 @@ import styles from "./page.module.css";
 function LoadingContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("query")?.trim() ?? "";
-  const hasQuery = Boolean(query);
+  const isSearchQuery = Boolean(query);
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <section
-          className={`${styles.hero} ${hasQuery ? styles.heroWithResults : styles.heroCentered}`}
-        >
+        <section className={`${styles.hero} ${styles.heroWithResults}`}>
           <h1 className={styles.srOnly}>MEC Livros</h1>
           <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
             <Image
@@ -34,7 +32,7 @@ function LoadingContent() {
               type="search"
               name="query"
               defaultValue={query}
-              placeholder="Pesquise"
+              placeholder="Pesquise por título, autor, URL ou ID"
               className={styles.searchInput}
               required
             />
@@ -44,7 +42,7 @@ function LoadingContent() {
           </form>
         </section>
 
-        {hasQuery && (
+        {isSearchQuery ? (
           <>
             <div className={styles.resultsSummarySkeleton} />
 
@@ -58,6 +56,29 @@ function LoadingContent() {
               ))}
             </section>
           </>
+        ) : (
+          <div className={styles.sliderContainer}>
+            <div className={styles.sliderHeader}>
+              <div className={styles.sliderTitleWrapper}>
+                <h2 className={styles.sliderTitle}>Recomendações:</h2>
+                <div className={styles.inlineSelectSkeleton} />
+              </div>
+              <div className={styles.sliderControls}>
+                <div className={styles.sliderArrowSkeleton} />
+                <div className={styles.sliderArrowSkeleton} />
+              </div>
+            </div>
+
+            <div className={styles.sliderTrack}>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className={styles.sliderCardSkeleton}>
+                  <div className={styles.coverWrapSkeleton} />
+                  <div className={styles.titleSkeleton} />
+                  <div className={styles.authorSkeleton} />
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </main>
     </div>
@@ -85,7 +106,7 @@ function FallbackLoading() {
             <input
               type="search"
               name="query"
-              placeholder="Pesquise"
+              placeholder="Pesquise por título, autor, URL ou ID"
               className={styles.searchInput}
               required
             />
@@ -95,17 +116,28 @@ function FallbackLoading() {
           </form>
         </section>
 
-        <div className={styles.resultsSummarySkeleton} />
-
-        <section className={styles.grid}>
-          {Array.from({ length: 12 }).map((_, index) => (
-            <div key={index} className={styles.cardSkeleton}>
-              <div className={styles.coverWrapSkeleton} />
-              <div className={styles.titleSkeleton} />
-              <div className={styles.authorSkeleton} />
+        <div className={styles.sliderContainer}>
+          <div className={styles.sliderHeader}>
+            <div className={styles.sliderTitleWrapper}>
+              <h2 className={styles.sliderTitle}>Recomendações:</h2>
+              <div className={styles.inlineSelectSkeleton} />
             </div>
-          ))}
-        </section>
+            <div className={styles.sliderControls}>
+              <div className={styles.sliderArrowSkeleton} />
+              <div className={styles.sliderArrowSkeleton} />
+            </div>
+          </div>
+
+          <div className={styles.sliderTrack}>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className={styles.sliderCardSkeleton}>
+                <div className={styles.coverWrapSkeleton} />
+                <div className={styles.titleSkeleton} />
+                <div className={styles.authorSkeleton} />
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
     </div>
   );
