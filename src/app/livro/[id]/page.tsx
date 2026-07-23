@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import styles from "./page.module.css";
@@ -12,31 +11,6 @@ type BookDetailsProps = {
     id: string;
   }>;
 };
-
-export async function generateMetadata({ params }: BookDetailsProps): Promise<Metadata> {
-  const { id } = await params;
-  try {
-    const book = await getBookById(id);
-    const author = book.authors?.join(", ") || "Autor desconhecido";
-    const description = book.description
-      ? book.description.slice(0, 160)
-      : `Livro ${book.title} por ${author} no MEC Livros.`;
-
-    return {
-      title: `${book.title} - MEC Livros`,
-      description,
-      openGraph: {
-        title: book.title,
-        description,
-        images: book.cover_filename ? [{ url: book.cover_filename }] : [],
-      },
-    };
-  } catch {
-    return {
-      title: "Livro não encontrado - MEC Livros",
-    };
-  }
-}
 
 function formatDate(value: string): string {
   if (!value) {
