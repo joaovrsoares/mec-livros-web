@@ -175,7 +175,7 @@ export default async function Home({ searchParams }: HomeProps) {
               type="search"
               name="query"
               defaultValue={query}
-              placeholder="Pesquise por título, autor, URL ou ID"
+              placeholder="Pesquise por título ou autor"
               className={styles.searchInput}
               required
             />
