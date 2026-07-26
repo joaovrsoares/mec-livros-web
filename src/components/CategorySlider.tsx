@@ -105,7 +105,7 @@ export default function CategorySlider({
                   src={getCoverUrl(book.cover_filename)}
                   alt={`Capa de ${book.title}`}
                   fill
-                  sizes="160px"
+                  sizes="(max-width: 760px) 170px, 220px"
                   className={styles.cover}
                   priority={index < 4}
                 />

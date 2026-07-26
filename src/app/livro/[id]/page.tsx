@@ -52,7 +52,7 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
             src={getCoverUrl(book.cover_filename)}
             alt={`Capa de ${book.title}`}
             fill
-            sizes="(max-width: 900px) 60vw, 300px"
+            sizes="(max-width: 900px) 100vw, 400px"
             className={styles.cover}
             priority
           />

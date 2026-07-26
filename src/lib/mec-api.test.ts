@@ -8,14 +8,23 @@ import {
   formatHomepageAuthors,
 } from "./mec-api";
 
-test("getCoverUrl returns direct CDN URLs for cover filenames and absolute URLs", () => {
+test("getCoverUrl normalizes cover URLs to static-meclivros covers-webp without query params", () => {
   const fullUrl = "https://static-meclivros.mec.gov.br/covers/9786587140315.jpg";
-  assert.equal(getCoverUrl(fullUrl), fullUrl);
+  assert.equal(
+    getCoverUrl(fullUrl),
+    "https://static-meclivros.mec.gov.br/covers-webp/9786587140315.jpg"
+  );
 
   const relativeFilename = "9786587140315.jpg";
   assert.equal(
     getCoverUrl(relativeFilename),
-    "https://static-meclivros.mec.gov.br/covers/9786587140315.jpg"
+    "https://static-meclivros.mec.gov.br/covers-webp/9786587140315.jpg"
+  );
+
+  const urlWithParam = "https://static-meclivros.mec.gov.br/covers-webp/9786587140315.jpg?w=600";
+  assert.equal(
+    getCoverUrl(urlWithParam),
+    "https://static-meclivros.mec.gov.br/covers-webp/9786587140315.jpg"
   );
 });
 

@@ -509,7 +509,12 @@
   padding: 6px 4px 12px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sliderTrack::-webkit-scrollbar {
+  display: none;
 }
 
 .sliderCard {

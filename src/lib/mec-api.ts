@@ -102,9 +102,18 @@ export async function searchBooks(params: {
     limit: String(params.limit),
   });
 
-  return fetchJson<MecSearchResponse>(
+  const res = await fetchJson<MecSearchResponse>(
     `${PUBLIC_API_BASE}/books/search?${searchParams.toString()}`,
   );
+
+  if (res.books) {
+    res.books = res.books.map((book) => ({
+      ...book,
+      cover_filename: getCoverUrl(book.cover_filename),
+    }));
+  }
+
+  return res;
 }
 
 export async function getCategoriesPreview(): Promise<MecCategoriesPreviewResponse> {
@@ -128,10 +137,7 @@ export async function getCategoryBooks(params: {
   if (res.books) {
     res.books = res.books.map((book) => ({
       ...book,
-      cover_filename:
-        book.cover_filename && !book.cover_filename.startsWith("http")
-          ? `https://static-meclivros.mec.gov.br/covers/${book.cover_filename}`
-          : book.cover_filename,
+      cover_filename: getCoverUrl(book.cover_filename),
     }));
   }
 
@@ -139,7 +145,11 @@ export async function getCategoryBooks(params: {
 }
 
 export async function getBookById(id: string): Promise<MecBook> {
-  return fetchJson<MecBook>(`${PUBLIC_API_BASE}/books/${id}`);
+  const book = await fetchJson<MecBook>(`${PUBLIC_API_BASE}/books/${id}`);
+  if (book && book.cover_filename) {
+    book.cover_filename = getCoverUrl(book.cover_filename);
+  }
+  return book;
 }
 
 export async function getDownloadInfo(
@@ -159,10 +169,19 @@ export async function getDownloadInfo(
 
 export function getCoverUrl(rawUrl: string): string {
   if (!rawUrl) return "";
-  if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
-    return rawUrl;
+  let url = rawUrl.split("?")[0];
+
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    const cleanPath = url.replace(/^\/?(covers\/|covers-webp\/)?/, "");
+    url = `https://static-meclivros.mec.gov.br/covers-webp/${cleanPath}`;
+  } else {
+    url = url.replace(
+      "static-meclivros.mec.gov.br/covers/",
+      "static-meclivros.mec.gov.br/covers-webp/"
+    );
   }
-  return `https://static-meclivros.mec.gov.br/covers/${rawUrl}`;
+
+  return url;
 }
 
 export const getProxyCoverUrl = getCoverUrl;

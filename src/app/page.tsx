@@ -75,7 +75,7 @@ function BookCard({ book, priority = false }: { book: MecBook; priority?: boolea
           src={getCoverUrl(book.cover_filename)}
           alt={`Capa de ${book.title}`}
           fill
-          sizes="(max-width: 1200px) 20vw, 160px"
+          sizes="(max-width: 760px) 50vw, (max-width: 1200px) 25vw, 300px"
           className={styles.cover}
           priority={priority}
         />
