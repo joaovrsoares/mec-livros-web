@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "../app/page.module.css";
 import {
-  getProxyCoverUrl,
+  getCoverUrl,
   formatHomepageTitle,
   formatHomepageAuthors,
   type MecBook,
@@ -102,7 +102,7 @@ export default function CategorySlider({
             >
               <div className={styles.coverWrap}>
                 <Image
-                  src={getProxyCoverUrl(book.cover_filename)}
+                  src={getCoverUrl(book.cover_filename)}
                   alt={`Capa de ${book.title}`}
                   fill
                   sizes="160px"

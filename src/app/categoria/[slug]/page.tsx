@@ -3,8 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import styles from "../../page.module.css";
-import { getCategoryBooks, getProxyCoverUrl, type MecBook } from "@/lib/mec-api";
-import { preloadBookCovers } from "@/lib/cover-cache";
+import { getCategoryBooks, getCoverUrl, type MecBook } from "@/lib/mec-api";
 
 type CategoryPageProps = {
   params: Promise<{
@@ -35,7 +34,7 @@ function BookCard({ book, priority = false }: { book: MecBook; priority?: boolea
     <Link href={`/livro/${book.id}`} className={styles.card}>
       <div className={styles.coverWrap}>
         <Image
-          src={getProxyCoverUrl(book.cover_filename)}
+          src={getCoverUrl(book.cover_filename)}
           alt={`Capa de ${book.title}`}
           fill
           sizes="(max-width: 1200px) 20vw, 160px"
@@ -57,9 +56,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   let categoryData;
   try {
     categoryData = await getCategoryBooks({ slug, page, limit: 12 });
-    if (categoryData?.books?.length) {
-      await preloadBookCovers(categoryData.books.map((b) => b.cover_filename));
-    }
   } catch {
     notFound();
   }

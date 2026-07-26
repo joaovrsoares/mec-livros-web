@@ -6,7 +6,7 @@ import {
   searchBooks,
   getCategoriesPreview,
   getCategoryBooks,
-  getProxyCoverUrl,
+  getCoverUrl,
   formatHomepageTitle,
   formatHomepageAuthors,
   type MecBook,
@@ -14,7 +14,6 @@ import {
   type MecCategory,
   type MecCategoryBooksResponse,
 } from "@/lib/mec-api";
-import { preloadBookCovers } from "@/lib/cover-cache";
 import CategorySlider from "@/components/CategorySlider";
 
 type HomeProps = {
@@ -73,7 +72,7 @@ function BookCard({ book, priority = false }: { book: MecBook; priority?: boolea
     <Link href={`/livro/${book.id}`} className={styles.card}>
       <div className={styles.coverWrap}>
         <Image
-          src={getProxyCoverUrl(book.cover_filename)}
+          src={getCoverUrl(book.cover_filename)}
           alt={`Capa de ${book.title}`}
           fill
           sizes="(max-width: 1200px) 20vw, 160px"
@@ -110,9 +109,6 @@ export default async function Home({ searchParams }: HomeProps) {
   if (query) {
     try {
       searchResult = await searchBooks({ query, page, limit: 12 });
-      if (searchResult?.books?.length) {
-        await preloadBookCovers(searchResult.books.map((b) => b.cover_filename));
-      }
     } catch (error) {
       errorMessage =
         error instanceof Error
@@ -124,9 +120,6 @@ export default async function Home({ searchParams }: HomeProps) {
     const selectedSlug = categoryParam || "ficcao-literaria";
     try {
       categoryResult = await getCategoryBooks({ slug: selectedSlug, page: 1, limit: 11 });
-      if (categoryResult?.books?.length) {
-        await preloadBookCovers(categoryResult.books.map((b) => b.cover_filename));
-      }
     } catch (error) {
       if (categoriesList.length > 0 && selectedSlug !== categoriesList[0].slug) {
         try {
@@ -135,9 +128,6 @@ export default async function Home({ searchParams }: HomeProps) {
             page: 1,
             limit: 11,
           });
-          if (categoryResult?.books?.length) {
-            await preloadBookCovers(categoryResult.books.map((b) => b.cover_filename));
-          }
         } catch {
           errorMessage = "Não foi possível carregar as recomendações de livros.";
         }

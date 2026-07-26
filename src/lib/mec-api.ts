@@ -157,13 +157,15 @@ export async function getDownloadInfo(
   });
 }
 
-export function getProxyCoverUrl(rawUrl: string): string {
+export function getCoverUrl(rawUrl: string): string {
   if (!rawUrl) return "";
-  if (rawUrl.startsWith("https://static-meclivros.mec.gov.br/")) {
-    return `/api/cover-proxy?url=${encodeURIComponent(rawUrl)}`;
+  if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+    return rawUrl;
   }
-  return rawUrl;
+  return `https://static-meclivros.mec.gov.br/covers/${rawUrl}`;
 }
+
+export const getProxyCoverUrl = getCoverUrl;
 
 export function formatHomepageTitle(title: string): string {
   if (!title) return "";
