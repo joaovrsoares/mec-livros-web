@@ -107,10 +107,33 @@ export async function searchBooks(params: {
   );
 
   if (res.books) {
-    res.books = res.books.map((book) => ({
-      ...book,
-      cover_filename: getCoverUrl(book.cover_filename),
-    }));
+    res.books = await Promise.all(
+      res.books.map(async (book) => {
+        let publisher = book.publisher?.trim();
+        let pageCount = book.page_count;
+
+        if (!publisher) {
+          try {
+            const detail = await getBookById(String(book.id));
+            if (detail?.publisher) {
+              publisher = detail.publisher;
+            }
+            if (!pageCount && detail?.page_count) {
+              pageCount = detail.page_count;
+            }
+          } catch {
+            // Keep original values if detail call fails
+          }
+        }
+
+        return {
+          ...book,
+          cover_filename: getCoverUrl(book.cover_filename),
+          publisher,
+          page_count: pageCount,
+        };
+      }),
+    );
   }
 
   return res;
@@ -118,6 +141,24 @@ export async function searchBooks(params: {
 
 export async function getCategoriesPreview(): Promise<MecCategoriesPreviewResponse> {
   return fetchJson<MecCategoriesPreviewResponse>(`${PUBLIC_API_BASE}/categories/preview`);
+}
+
+const bookCache = new Map<string, { book: MecBook; timestamp: number }>();
+const BOOK_CACHE_TTL = 1000 * 60 * 15; // 15 minutes
+
+export async function getBookById(id: string): Promise<MecBook> {
+  const cached = bookCache.get(id);
+  if (cached && Date.now() - cached.timestamp < BOOK_CACHE_TTL) {
+    return cached.book;
+  }
+  const book = await fetchJson<MecBook>(`${PUBLIC_API_BASE}/books/${id}`);
+  if (book && book.cover_filename) {
+    book.cover_filename = getCoverUrl(book.cover_filename);
+  }
+  if (book) {
+    bookCache.set(id, { book, timestamp: Date.now() });
+  }
+  return book;
 }
 
 export async function getCategoryBooks(params: {
@@ -135,21 +176,36 @@ export async function getCategoryBooks(params: {
   );
 
   if (res.books) {
-    res.books = res.books.map((book) => ({
-      ...book,
-      cover_filename: getCoverUrl(book.cover_filename),
-    }));
+    res.books = await Promise.all(
+      res.books.map(async (book) => {
+        let publisher = book.publisher;
+        let pageCount = book.page_count;
+
+        if (!publisher) {
+          try {
+            const detail = await getBookById(String(book.id));
+            if (detail?.publisher) {
+              publisher = detail.publisher;
+            }
+            if (!pageCount && detail?.page_count) {
+              pageCount = detail.page_count;
+            }
+          } catch {
+            // Keep original values if detail call fails
+          }
+        }
+
+        return {
+          ...book,
+          cover_filename: getCoverUrl(book.cover_filename),
+          publisher,
+          page_count: pageCount,
+        };
+      }),
+    );
   }
 
   return res;
-}
-
-export async function getBookById(id: string): Promise<MecBook> {
-  const book = await fetchJson<MecBook>(`${PUBLIC_API_BASE}/books/${id}`);
-  if (book && book.cover_filename) {
-    book.cover_filename = getCoverUrl(book.cover_filename);
-  }
-  return book;
 }
 
 export async function getDownloadInfo(
@@ -202,4 +258,29 @@ export function formatHomepageAuthors(authors?: string[]): string {
     return authors.join(", ");
   }
   return `${authors[0]}, ${authors[1]} e mais`;
+}
+
+export function formatLanguage(language?: string): string {
+  if (!language) {
+    return "Não informado";
+  }
+
+  const code = language.trim().toLowerCase();
+  if (!code) {
+    return "Não informado";
+  }
+
+  try {
+    const displayName = new Intl.DisplayNames(["pt-BR"], {
+      type: "language",
+    }).of(code);
+
+    if (displayName && displayName.toLowerCase() !== code) {
+      return displayName.charAt(0).toLocaleUpperCase("pt-BR") + displayName.slice(1);
+    }
+  } catch {
+    // Preserve the API value when the runtime does not support this code.
+  }
+
+  return language;
 }

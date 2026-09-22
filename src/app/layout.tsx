@@ -17,23 +17,23 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mec.joaovrsoares.de
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MEC Livros - Busca e Download Gratuito de Livros",
-    template: "%s | MEC Livros",
+    default: "Livraria - Busca e Download Gratuito de Livros",
+    template: "%s | Livraria",
   },
   description:
-    "Busque títulos públicos da biblioteca do MEC e baixe livros gratuitamente em formato EPUB descriptografado ou PDF A4.",
+    "Busque livros na Livraria e baixe gratuitamente em formato EPUB ou PDF A4.",
   keywords: [
-    "MEC Livros",
+    "Livraria",
     "Livros Gratuitos",
     "EPUB",
     "PDF A4",
-    "Biblioteca MEC",
+    "Biblioteca",
     "Download de Livros",
     "Domínio Público",
   ],
-  authors: [{ name: "MEC Livros" }],
-  creator: "MEC Livros",
-  publisher: "MEC Livros",
+  authors: [{ name: "Livraria" }],
+  creator: "Livraria",
+  publisher: "Livraria",
   formatDetection: {
     email: false,
     address: false,
@@ -43,25 +43,25 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: siteUrl,
-    siteName: "MEC Livros",
-    title: "MEC Livros - Busca e Download Gratuito de Livros",
+    siteName: "Livraria",
+    title: "Livraria - Busca e Download Gratuito de Livros",
     description:
-      "Busque títulos públicos da biblioteca do MEC e baixe livros gratuitamente em formato EPUB descriptografado ou PDF A4.",
+      "Busque livros na Livraria e baixe gratuitamente em formato EPUB ou PDF A4.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/meta-image.png",
         width: 1200,
         height: 628,
-        alt: "MEC Livros - Busca e Download Gratuito de Livros",
+        alt: "Livraria - Busca e Download Gratuito de Livros",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MEC Livros - Busca e Download Gratuito de Livros",
+    title: "Livraria - Busca e Download Gratuito de Livros",
     description:
-      "Busque títulos públicos do MEC e baixe livros em formato EPUB descriptografado ou PDF A4 gratuitamente.",
-    images: ["/og-image.png"],
+      "Busque livros na Livraria e baixe em formato EPUB ou PDF A4 gratuitamente.",
+    images: ["/meta-image.png"],
   },
   robots: {
     index: true,
@@ -76,6 +76,8 @@ export const metadata: Metadata = {
   },
 };
 
+import ScrollToTop from "@/components/ScrollToTop";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -83,7 +85,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <ScrollToTop />
+        {children}
+      </body>
     </html>
   );
 }

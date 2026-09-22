@@ -19,9 +19,13 @@ export default function CategoryLoading() {
         <section className={styles.grid}>
           {Array.from({ length: 12 }).map((_, index) => (
             <div key={index} className={styles.cardSkeleton}>
-              <div className={styles.coverWrapSkeleton} />
-              <div className={styles.titleSkeleton} />
-              <div className={styles.authorSkeleton} />
+              <div className={styles.cardCoverWrapSkeleton} />
+              <div className={styles.cardBodySkeleton}>
+                <div className={styles.titleSkeleton} />
+                <div className={styles.authorSkeleton} />
+                <div className={styles.metaSkeleton} />
+                <div className={styles.metaSkeleton} style={{ width: "45%" }} />
+              </div>
             </div>
           ))}
         </section>

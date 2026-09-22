@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import styles from "../../page.module.css";
-import { getCategoryBooks, getCoverUrl, type MecBook } from "@/lib/mec-api";
+import { getCategoryBooks } from "@/lib/mec-api";
+import BookCard from "@/components/BookCard";
 
 type CategoryPageProps = {
   params: Promise<{
@@ -26,26 +26,6 @@ function paginationItems(current: number, total: number): number[] {
   const start = Math.max(1, current - 3);
   const end = Math.min(total, current + 3);
   return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-}
-
-function BookCard({ book, priority = false }: { book: MecBook; priority?: boolean }) {
-  const author = book.authors?.join(", ") || "Autor desconhecido";
-  return (
-    <Link href={`/livro/${book.id}`} className={styles.card}>
-      <div className={styles.coverWrap}>
-        <Image
-          src={getCoverUrl(book.cover_filename)}
-          alt={`Capa de ${book.title}`}
-          fill
-          sizes="(max-width: 760px) 50vw, (max-width: 1200px) 25vw, 300px"
-          className={styles.cover}
-          priority={priority}
-        />
-      </div>
-      <h3 className={styles.cardTitle}>{book.title}</h3>
-      <p className={styles.cardAuthor}>{author}</p>
-    </Link>
-  );
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {

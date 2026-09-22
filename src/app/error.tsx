@@ -32,7 +32,7 @@ export default function ErrorBoundary({
         Ops! Algo deu errado
       </h2>
       <p style={{ color: "#64748b", maxWidth: 480, marginBottom: "1.5rem" }}>
-        Ocorreu um erro ao carregar esta página. Pode ter ocorrido uma instabilidade temporária na API do MEC ou na sua conexão.
+        Ocorreu um erro ao carregar esta página. Pode ter ocorrido uma instabilidade temporária no servidor ou na sua conexão.
       </p>
       <div style={{ display: "flex", gap: "1rem" }}>
         <button

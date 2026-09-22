@@ -66,20 +66,27 @@ export async function GET(
     const { output } = await decryptEpubBuffer(encryptedBuffer);
 
     // Convert decrypted EPUB buffer to PDF (A4)
-    const pdfBuffer = await convertEpubToPdf(output);
-    const filenameBase = toSafeFileName(book.title);
+    const pdfBuffer = await convertEpubToPdf(output, {
+      title: book.title,
+      author: book.authors?.filter(Boolean).join(", "),
+      bookId: book.id,
+    });
+    const filenameBase = toSafeFileName(
+      [book.authors?.[0], book.title].filter(Boolean).join(" - "),
+    );
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${filenameBase}.pdf"`,
+        "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(`${filenameBase}.pdf`)}`,
         "X-MEC-Book-Id": String(book.id),
         "X-RateLimit-Remaining-Daily": String(rateLimit.remainingDaily),
       },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro interno ao gerar PDF.";
+    console.error("PDF conversion error:", error);
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

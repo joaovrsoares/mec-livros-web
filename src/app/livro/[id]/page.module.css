@@ -100,6 +100,26 @@
   }
 }
 
+@media (max-width: 760px) {
+  .page {
+    padding: 16px 16px 48px;
+    gap: 16px;
+  }
+
+  .coverWrap {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .author {
+    font-size: 1rem;
+  }
+}
+
 .coverWrapSkeleton {
   width: 100%;
   aspect-ratio: 2 / 3;

@@ -108,11 +108,11 @@ export function checkRateLimit(clientId: string, nowMs: number): {
 
 export function toSafeFileName(name: string): string {
   const normalized = name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9.\-_ ]/g, "")
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "")
     .trim()
-    .replace(/\s+/g, "_");
+    .replace(/\s+/g, " ")
+    .replace(/[. ]+$/g, "");
 
   return normalized || "livro";
 }
+

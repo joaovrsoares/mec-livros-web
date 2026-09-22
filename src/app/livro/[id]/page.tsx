@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import styles from "./page.module.css";
 import DownloadButton from "@/components/DownloadButton";
-import { getBookById, getCoverUrl } from "@/lib/mec-api";
+import { formatLanguage, getBookById, getCoverUrl } from "@/lib/mec-api";
 
 type BookDetailsProps = {
   params: Promise<{
@@ -68,10 +68,10 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
             <strong>Publicado em:</strong> {formatDate(book.published_date)}
           </p>
           <p className={styles.meta}>
-            <strong>Páginas:</strong> {book.page_count || 0}
+            <strong>Páginas:</strong> {book.page_count || 0} (aprox.)
           </p>
           <p className={styles.meta}>
-            <strong>Idioma:</strong> {book.language || "Não informado"}
+            <strong>Idioma:</strong> {formatLanguage(book.language)}
           </p>
           <p className={styles.meta}>
             <strong>Categorias:</strong>{" "}
@@ -82,6 +82,7 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
             <DownloadButton
               bookId={book.id}
               bookTitle={book.title}
+              bookAuthors={book.authors}
               hasEpub={book.has_epub}
             />
           </div>

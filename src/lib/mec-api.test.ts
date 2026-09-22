@@ -6,6 +6,7 @@ import {
   getCategoryBooks,
   formatHomepageTitle,
   formatHomepageAuthors,
+  formatLanguage,
 } from "./mec-api";
 
 test("getCoverUrl normalizes cover URLs to static-meclivros covers-webp without query params", () => {
@@ -64,4 +65,10 @@ test("formatHomepageAuthors formats author list according to count rules", () =>
     formatHomepageAuthors(["Machado de Assis", "José de Alencar", "Clarice Lispector"]),
     "Machado de Assis, José de Alencar e mais"
   );
+});
+
+test("formatLanguage translates ISO 639-2 codes to Portuguese", () => {
+  assert.equal(formatLanguage("por"), "Português");
+  assert.equal(formatLanguage("eng"), "Inglês");
+  assert.equal(formatLanguage(""), "Não informado");
 });

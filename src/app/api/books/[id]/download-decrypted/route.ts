@@ -17,6 +17,8 @@ export async function GET(
 ): Promise<NextResponse> {
   const { id } = await context.params;
   const token = process.env.MEC_LIVROS_BEARER_TOKEN;
+  const startedAt = Date.now();
+  let stage = "start";
 
   if (!token) {
     return NextResponse.json(
@@ -46,6 +48,7 @@ export async function GET(
   }
 
   try {
+    stage = "fetch-book-and-download-info";
     const [book, downloadInfo] = await Promise.all([
       getBookById(id),
       getDownloadInfo(id, token),
@@ -61,16 +64,19 @@ export async function GET(
       );
     }
 
+    stage = "download-encrypted-epub";
     const encryptedBuffer = Buffer.from(await encryptedResponse.arrayBuffer());
     const { output, totalHtmlFiles, decryptedHtmlFiles } =
       await decryptEpubBuffer(encryptedBuffer);
 
-    const filenameBase = toSafeFileName(book.title);
+    const filenameBase = toSafeFileName(
+      [book.authors?.[0], book.title].filter(Boolean).join(" - "),
+    );
     return new NextResponse(new Uint8Array(output), {
       status: 200,
       headers: {
         "Content-Type": "application/epub+zip",
-        "Content-Disposition": `attachment; filename="${filenameBase}.decrypted.epub"`,
+        "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(`${filenameBase}.epub`)}`,
         "X-MEC-Book-Id": String(book.id),
         "X-MEC-HTML-Total": String(totalHtmlFiles),
         "X-MEC-HTML-Decrypted": String(decryptedHtmlFiles),
@@ -81,6 +87,13 @@ export async function GET(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro interno.";
+    console.error("[DOWNLOAD] Failed", {
+      id,
+      stage,
+      durationMs: Date.now() - startedAt,
+      error: message,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

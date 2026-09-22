@@ -6,15 +6,12 @@ import {
   searchBooks,
   getCategoriesPreview,
   getCategoryBooks,
-  getCoverUrl,
-  formatHomepageTitle,
-  formatHomepageAuthors,
-  type MecBook,
   type MecSearchResponse,
   type MecCategory,
   type MecCategoryBooksResponse,
 } from "@/lib/mec-api";
 import CategorySlider from "@/components/CategorySlider";
+import BookCard from "@/components/BookCard";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -63,27 +60,6 @@ function buildQueryHref(query: string, page: number): string {
     page: String(page),
   });
   return `/?${params.toString()}`;
-}
-
-function BookCard({ book, priority = false }: { book: MecBook; priority?: boolean }) {
-  const title = formatHomepageTitle(book.title);
-  const author = formatHomepageAuthors(book.authors);
-  return (
-    <Link href={`/livro/${book.id}`} className={styles.card}>
-      <div className={styles.coverWrap}>
-        <Image
-          src={getCoverUrl(book.cover_filename)}
-          alt={`Capa de ${book.title}`}
-          fill
-          sizes="(max-width: 760px) 50vw, (max-width: 1200px) 25vw, 300px"
-          className={styles.cover}
-          priority={priority}
-        />
-      </div>
-      <h3 className={styles.cardTitle}>{title}</h3>
-      <p className={styles.cardAuthor}>{author}</p>
-    </Link>
-  );
 }
 
 export default async function Home({ searchParams }: HomeProps) {
@@ -148,13 +124,13 @@ export default async function Home({ searchParams }: HomeProps) {
         <section
           className={`${styles.hero} ${searchResult || categoryResult ? styles.heroWithResults : styles.heroCentered}`}
         >
-          <h1 className={styles.srOnly}>MEC Livros</h1>
+          <h1 className={styles.srOnly}>Livraria</h1>
           <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
             <Image
-              src="/logo-desktop.png"
-              alt="MEC Livros"
+              src="/logo.svg"
+              alt="Livraria"
               width={280}
-              height={84}
+              height={62}
               priority
               className={styles.logo}
             />

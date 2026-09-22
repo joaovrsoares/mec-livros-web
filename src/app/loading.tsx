@@ -15,13 +15,13 @@ function LoadingContent() {
     <div className={styles.page}>
       <main className={styles.main}>
         <section className={`${styles.hero} ${styles.heroWithResults}`}>
-          <h1 className={styles.srOnly}>MEC Livros</h1>
+          <h1 className={styles.srOnly}>Livraria</h1>
           <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
             <Image
-              src="/logo-desktop.png"
-              alt="MEC Livros"
+              src="/logo.svg"
+              alt="Livraria"
               width={280}
-              height={84}
+              height={62}
               priority
               className={styles.logo}
             />
@@ -32,7 +32,7 @@ function LoadingContent() {
               type="search"
               name="query"
               defaultValue={query}
-              placeholder="Pesquise por título, autor, URL ou ID"
+              placeholder="Pesquise por título ou autor"
               className={styles.searchInput}
               required
             />
@@ -49,9 +49,13 @@ function LoadingContent() {
             <section className={styles.grid}>
               {Array.from({ length: 12 }).map((_, index) => (
                 <div key={index} className={styles.cardSkeleton}>
-                  <div className={styles.coverWrapSkeleton} />
-                  <div className={styles.titleSkeleton} />
-                  <div className={styles.authorSkeleton} />
+                  <div className={styles.cardCoverWrapSkeleton} />
+                  <div className={styles.cardBodySkeleton}>
+                    <div className={styles.titleSkeleton} />
+                    <div className={styles.authorSkeleton} />
+                    <div className={styles.metaSkeleton} />
+                    <div className={styles.metaSkeleton} style={{ width: "45%" }} />
+                  </div>
                 </div>
               ))}
             </section>
@@ -90,13 +94,13 @@ function FallbackLoading() {
     <div className={styles.page}>
       <main className={styles.main}>
         <section className={`${styles.hero} ${styles.heroWithResults}`}>
-          <h1 className={styles.srOnly}>MEC Livros</h1>
+          <h1 className={styles.srOnly}>Livraria</h1>
           <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
             <Image
-              src="/logo-desktop.png"
-              alt="MEC Livros"
+              src="/logo.svg"
+              alt="Livraria"
               width={280}
-              height={84}
+              height={62}
               priority
               className={styles.logo}
             />
@@ -106,7 +110,7 @@ function FallbackLoading() {
             <input
               type="search"
               name="query"
-              placeholder="Pesquise por título, autor, URL ou ID"
+              placeholder="Pesquise por título ou autor"
               className={styles.searchInput}
               required
             />
