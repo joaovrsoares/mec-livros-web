@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { decryptEpubBuffer } from "@/lib/decrypt-epub";
 import { checkRateLimit, getClientId, toSafeFileName } from "@/lib/download-rate-limit";
-import { convertEpubToPdf } from "@/lib/epub-to-pdf";
+import { convertEpubToPdf } from "@/lib/epub";
 import { getBookById, getDownloadInfo } from "@/lib/mec-api";
 
 export const runtime = "nodejs";

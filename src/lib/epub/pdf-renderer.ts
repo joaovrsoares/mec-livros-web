@@ -176,7 +176,7 @@ export async function addPageNumbers(pdfBuffer: Buffer): Promise<Buffer> {
   
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
-    const { width, height } = page.getSize();
+    const { width } = page.getSize();
     const text = `${i + 1} / ${pages.length}`;
     const fontSize = 9;
     const textWidth = font.widthOfTextAtSize(text, fontSize);

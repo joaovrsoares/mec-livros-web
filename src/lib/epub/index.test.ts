@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { sanitizeEpubCss } from "./epub-to-pdf";
+import { sanitizeEpubCss } from "./css-sanitizer";
 
 test("sanitizeEpubCss - does NOT scale fonts for book ID 300007576", () => {
   const css = `

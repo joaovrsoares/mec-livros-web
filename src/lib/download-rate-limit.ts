@@ -51,6 +51,15 @@ export function checkRateLimit(clientId: string, nowMs: number): {
   const shortWindowMs = DOWNLOAD_SHORT_WINDOW_SECONDS * 1000;
   const dayWindowMs = 24 * 60 * 60 * 1000;
 
+  // Prevent memory leaks: prune old entries if map grows beyond 5000 IPs
+  if (rateLimitByClient.size > 5000) {
+    for (const [key, val] of rateLimitByClient.entries()) {
+      if (nowMs - val.dayWindowStartedAt >= dayWindowMs) {
+        rateLimitByClient.delete(key);
+      }
+    }
+  }
+
   const state = rateLimitByClient.get(clientId) ?? {
     shortWindowStartedAt: nowMs,
     shortWindowCount: 0,
