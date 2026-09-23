@@ -49,6 +49,10 @@ export function buildUnifiedHtml(
     div.epub-non-toc-h1 { font-size: 2em; margin: 0.67em 0; }
     div.epub-non-toc-h2 { font-size: 1.5em; margin: 0.83em 0; }
     div.epub-non-toc-h3 { font-size: 1.17em; margin: 1em 0; }
+    .epub-dialog-dash {
+      display: inline-block;
+      padding-right: 0.35em;
+    }
     body {
       overflow-wrap: break-word;
       word-wrap: break-word;
@@ -252,6 +256,8 @@ export function buildUnifiedHtml(
       object-fit: contain !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
+      image-rendering: high-quality !important;
+      image-rendering: -webkit-optimize-contrast !important;
     }
     /* Block-level images (wrapped in p or figure — centre them) */
     figure, p > img:only-child, .epub-chapter-image img {
@@ -265,6 +271,8 @@ export function buildUnifiedHtml(
       max-width: 175mm !important;
       margin: 0 auto !important;
       object-fit: contain !important;
+      image-rendering: high-quality !important;
+      image-rendering: -webkit-optimize-contrast !important;
     }
     svg, figure {
       max-width: 100% !important;

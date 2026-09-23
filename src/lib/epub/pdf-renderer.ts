@@ -102,8 +102,28 @@ export async function generatePdfFromHtml(html: string, title: string): Promise<
   try {
     console.log("[generatePdfFromHtml] Creating new page...");
     const page = await browser.newPage();
+    
+    // Set a high device scale factor to force high-resolution rasterization of images
+    // Dimensions match A4 at 150 DPI (approx 1240x1754)
+    await page.setViewport({ width: 1240, height: 1754, deviceScaleFactor: 2 });
+    
     console.log("[generatePdfFromHtml] Setting content, HTML length:", html.length);
+    // Use networkidle0 to ensure external/data URI resources are fully loaded
     await page.setContent(html, { waitUntil: "domcontentloaded" });
+    
+    // Explicitly wait for all images to decode
+    await page.evaluate(async () => {
+      const images = Array.from(document.querySelectorAll("img"));
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        })
+      );
+    });
     console.log("[generatePdfFromHtml] Content set, generating PDF...");
 
     if (title) {
