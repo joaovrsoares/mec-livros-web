@@ -100,23 +100,54 @@
 
 @media (max-width: 640px) {
   .headerInner {
-    padding: 10px 14px;
-    gap: 12px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .headerActions {
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .logoLink {
+    flex-shrink: 0;
   }
 
   .logo {
-    width: 110px;
+    width: 90px;
+  }
+
+  .searchForm {
+    gap: 4px;
+    min-width: 0;
   }
 
   .searchInput {
+    min-width: 0;
     min-height: 36px;
-    font-size: 0.85rem;
-    padding: 0 12px;
+    font-size: 0.82rem;
+    padding: 0 10px;
   }
 
   .searchButton {
     min-height: 36px;
-    padding: 0 14px;
-    font-size: 0.82rem;
+    padding: 0 10px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .logo {
+    width: 76px;
+  }
+
+  .searchInput::placeholder {
+    font-size: 0.78rem;
+  }
+
+  .searchButton {
+    padding: 0 8px;
+    font-size: 0.76rem;
   }
 }
