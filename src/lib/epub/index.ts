@@ -330,6 +330,10 @@ export async function convertEpubToPdf(
   // CSS cache: resolved <style> blocks keyed by zip path (avoids re-embedding fonts per chapter)
   const cssCache = new Map<string, string>();
   let hasCoverBookmarkEmitted = false;
+  const candidateOutlineTitles = new Set<string>(["Capa"]);
+  for (const item of tocMap.values()) {
+    if (item.title) candidateOutlineTitles.add(item.title.trim());
+  }
 
   for (const href of hrefs) {
     const zipPath = normalizeZipPath(baseDir, href);
@@ -355,6 +359,13 @@ export async function convertEpubToPdf(
     }
 
     const hasExistingHeading = /<h[1-6]\b/i.test(inlined);
+    if (hasExistingHeading) {
+      const headingMatches = inlined.matchAll(/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/gi);
+      for (const hm of headingMatches) {
+        const text = hm[1].replace(/<[^>]+>/g, "").trim().replace(/\s+/g, " ");
+        if (text) candidateOutlineTitles.add(text);
+      }
+    }
 
     const isFirstChapter = chapterHtmls.length === 0;
     const isCover =
@@ -438,12 +449,12 @@ export async function convertEpubToPdf(
     
     console.log("[convertEpubToPdf] Merging batch PDFs...");
     const mergedRaw = await mergePdfBuffers(batchPdfs);
-    const numberedPdf = await addPageNumbers(mergedRaw);
+    const numberedPdf = await addPageNumbers(mergedRaw, candidateOutlineTitles);
     return injectPdfMetadata(numberedPdf, { title: resolvedTitle, author: resolvedAuthor });
   }
 
   console.log("[convertEpubToPdf] HTML size OK, single-pass rendering");
   const pdfBuffer = await generatePdfFromHtml(unifiedHtml, resolvedTitle);
-  const numberedPdf = await addPageNumbers(pdfBuffer);
+  const numberedPdf = await addPageNumbers(pdfBuffer, candidateOutlineTitles);
   return injectPdfMetadata(numberedPdf, { title: resolvedTitle, author: resolvedAuthor });
 }

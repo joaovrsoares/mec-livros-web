@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { PDFDocument, PDFPage } from "pdf-lib";
+import { PDFDocument, PDFPage, PDFName, PDFHexString, PDFString } from "pdf-lib";
 
 export function toPdfHexString(str: string): string {
   const fullStr = "\uFEFF" + str;
@@ -169,8 +169,52 @@ export async function mergePdfBuffers(buffers: Buffer[]): Promise<Buffer> {
 
 import { rgb, StandardFonts } from "pdf-lib";
 
-export async function addPageNumbers(pdfBuffer: Buffer): Promise<Buffer> {
+function sanitizePdfOutlines(pdfDoc: PDFDocument, candidateTitles?: Set<string>) {
+  const outlines = pdfDoc.catalog.lookup(PDFName.of("Outlines"));
+  if (!outlines) return;
+
+  function traverse(itemRefOrDict: any) {
+    if (!itemRefOrDict) return;
+    const dict = itemRefOrDict.dict || itemRefOrDict;
+    const titleObj = dict.get(PDFName.of("Title"));
+    if (titleObj) {
+      let title = "";
+      if (titleObj instanceof PDFHexString || titleObj instanceof PDFString) {
+        title = titleObj.decodeText();
+      }
+      if (title) {
+        let clean = title.replace(/\u00a0/g, " ").trim();
+        if (candidateTitles) {
+          const squashed = clean.replace(/\s+/g, "").toLowerCase();
+          for (const candidate of candidateTitles) {
+            if (candidate.replace(/\s+/g, "").toLowerCase() === squashed) {
+              clean = candidate;
+              break;
+            }
+          }
+        }
+        if (clean !== title) {
+          dict.set(PDFName.of("Title"), PDFHexString.fromText(clean));
+        }
+      }
+    }
+    const first = dict.get(PDFName.of("First"));
+    if (first) traverse(pdfDoc.context.lookup(first));
+    const next = dict.get(PDFName.of("Next"));
+    if (next) traverse(pdfDoc.context.lookup(next));
+  }
+
+  const first = outlines.get(PDFName.of("First"));
+  if (first) traverse(pdfDoc.context.lookup(first));
+}
+
+export async function addPageNumbers(
+  pdfBuffer: Buffer,
+  candidateTitles?: Set<string>
+): Promise<Buffer> {
   const pdfDoc = await PDFDocument.load(pdfBuffer);
+  sanitizePdfOutlines(pdfDoc, candidateTitles);
+
   const pages = pdfDoc.getPages();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   
@@ -194,3 +238,4 @@ export async function addPageNumbers(pdfBuffer: Buffer): Promise<Buffer> {
   
   return Buffer.from(await pdfDoc.save());
 }
+
