@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { findOpfPath, extractOpfMetadata, extractSpineHrefs, extractTocMap, normalizeZipPath, escapeHtml } from "./epub-parser";
 import { inlineChapterAssets, isContentVisuallyEmpty, isOnlyImageContent, getChapterAnchorId, bridgeDemotedHeadingStyles } from "./html-generator";
-import { generatePdfFromHtml, injectPdfMetadata, mergePdfBuffers } from "./pdf-renderer";
+import { generatePdfFromHtml, injectPdfMetadata, mergePdfBuffers, addPageNumbers } from "./pdf-renderer";
 
 export interface PdfMetadata {
   title?: string;
@@ -429,10 +429,12 @@ export async function convertEpubToPdf(
     
     console.log("[convertEpubToPdf] Merging batch PDFs...");
     const mergedRaw = await mergePdfBuffers(batchPdfs);
-    return injectPdfMetadata(mergedRaw, { title: resolvedTitle, author: resolvedAuthor });
+    const numberedPdf = await addPageNumbers(mergedRaw);
+    return injectPdfMetadata(numberedPdf, { title: resolvedTitle, author: resolvedAuthor });
   }
 
   console.log("[convertEpubToPdf] HTML size OK, single-pass rendering");
   const pdfBuffer = await generatePdfFromHtml(unifiedHtml, resolvedTitle);
-  return injectPdfMetadata(pdfBuffer, { title: resolvedTitle, author: resolvedAuthor });
+  const numberedPdf = await addPageNumbers(pdfBuffer);
+  return injectPdfMetadata(numberedPdf, { title: resolvedTitle, author: resolvedAuthor });
 }

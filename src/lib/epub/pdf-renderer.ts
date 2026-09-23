@@ -124,13 +124,7 @@ export async function generatePdfFromHtml(html: string, title: string): Promise<
         right: "25mm",
       },
       printBackground: true,
-      displayHeaderFooter: true,
-      headerTemplate: "<span></span>",
-      footerTemplate: `
-        <div style="font-size: 9px; font-family: sans-serif; text-align: center; width: 100%; color: #888888;">
-          <span class="pageNumber"></span> / <span class="totalPages"></span>
-        </div>
-      `,
+      displayHeaderFooter: false,
     });
 
     return Buffer.from(pdfUint8Array);
@@ -151,4 +145,32 @@ export async function mergePdfBuffers(buffers: Buffer[]): Promise<Buffer> {
   }
   const mergedBytes = await mergedPdf.save();
   return Buffer.from(mergedBytes);
+}
+
+import { rgb, StandardFonts } from "pdf-lib";
+
+export async function addPageNumbers(pdfBuffer: Buffer): Promise<Buffer> {
+  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  const pages = pdfDoc.getPages();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  
+  for (let i = 0; i < pages.length; i++) {
+    const page = pages[i];
+    const { width, height } = page.getSize();
+    const text = `${i + 1} / ${pages.length}`;
+    const fontSize = 9;
+    const textWidth = font.widthOfTextAtSize(text, fontSize);
+    
+    // 25mm is approximately 70.8 points. We place the text vertically centered in that bottom margin,
+    // which is about 35 points from the bottom edge.
+    page.drawText(text, {
+      x: width / 2 - textWidth / 2,
+      y: 35,
+      size: fontSize,
+      font: font,
+      color: rgb(0.533, 0.533, 0.533),
+    });
+  }
+  
+  return Buffer.from(await pdfDoc.save());
 }
