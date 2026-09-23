@@ -1,12 +1,15 @@
 import Link from "next/link";
+import Header from "@/components/Header";
 import styles from "./page.module.css";
 
 export default function BookDetailsLoading() {
   return (
-    <main className={styles.page}>
-      <Link href="/" className={styles.backLink}>
-        ← Voltar para busca
-      </Link>
+    <>
+      <Header />
+      <main className={styles.page}>
+        <div className={styles.backLink}>
+          ← Carregando livro...
+        </div>
 
       <section className={styles.content}>
         <div className={styles.coverWrapSkeleton} />
@@ -30,5 +33,6 @@ export default function BookDetailsLoading() {
         <div className={styles.descriptionSkeleton} style={{ width: "80%" }} />
       </section>
     </main>
-  );
+  </>
+);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,6 +30,7 @@ export default function CategorySlider({
 }: CategorySliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const scrollLeft = () => {
     if (trackRef.current) {
@@ -46,7 +47,9 @@ export default function CategorySlider({
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedSlug = e.target.value;
     if (selectedSlug) {
-      router.push(`/?category=${selectedSlug}`);
+      startTransition(() => {
+        router.push(`/?category=${selectedSlug}`);
+      });
     }
   };
 
@@ -59,7 +62,8 @@ export default function CategorySlider({
             <select
               value={activeSlug || categorySlug}
               onChange={handleCategoryChange}
-              className={styles.inlineCategorySelect}
+              disabled={isPending}
+              className={`${styles.inlineCategorySelect} ${isPending ? styles.selectPending : ""}`}
               aria-label="Selecione uma categoria"
             >
               {categories.map((cat) => (

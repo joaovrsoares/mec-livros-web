@@ -10,6 +10,7 @@ import {
   type MecCategory,
   type MecCategoryBooksResponse,
 } from "@/lib/mec-api";
+import Pagination from "@/components/Pagination";
 import CategorySlider from "@/components/CategorySlider";
 import BookCard from "@/components/BookCard";
 
@@ -46,12 +47,6 @@ function parsePage(value?: string): number {
     return 1;
   }
   return Math.floor(parsed);
-}
-
-function paginationItems(current: number, total: number): number[] {
-  const start = Math.max(1, current - 3);
-  const end = Math.min(total, current + 3);
-  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
 
 function buildQueryHref(query: string, page: number): string {
@@ -137,7 +132,11 @@ export default async function Home({ searchParams }: HomeProps) {
           </Link>
 
           <form method="GET" className={styles.searchForm}>
+            <label htmlFor="home-search-input" className={styles.srOnly}>
+              Pesquise por título ou autor
+            </label>
             <input
+              id="home-search-input"
               type="search"
               name="query"
               defaultValue={query}
@@ -154,6 +153,26 @@ export default async function Home({ searchParams }: HomeProps) {
         </section>
 
         {/* Text Search Results (Grid with pagination) */}
+        {query && searchResult && searchResult.books.length === 0 && (
+          <section className={styles.noResultsContainer}>
+            <div className={styles.noResultsIcon} aria-hidden="true">
+              🔍
+            </div>
+            <h2 className={styles.noResultsTitle}>Nenhum livro encontrado</h2>
+            <p className={styles.noResultsText}>
+              Não encontramos resultados para &ldquo;<strong>{query}</strong>&rdquo;.
+            </p>
+            <div className={styles.noResultsSuggestions}>
+              <strong>Dicas de busca:</strong>
+              <ul>
+                <li>Verifique se o nome do autor ou título foi digitado corretamente.</li>
+                <li>Tente usar termos mais genéricos ou palavras-chave diferentes.</li>
+                <li>Você também pode buscar diretamente colando o ID de 9 dígitos do livro.</li>
+              </ul>
+            </div>
+          </section>
+        )}
+
         {searchResult && searchResult.books.length > 0 && (
           <>
             <p className={styles.resultsSummary}>
@@ -167,45 +186,12 @@ export default async function Home({ searchParams }: HomeProps) {
               ))}
             </section>
 
-            {searchResult.pagination.total_pages > 1 && (
-              <nav className={styles.pagination} aria-label="Paginação">
-                {searchResult.pagination.has_previous_page ? (
-                  <Link
-                    className={styles.pageButton}
-                    href={buildQueryHref(query, page - 1)}
-                  >
-                    Anterior
-                  </Link>
-                ) : (
-                  <span className={styles.pageButtonDisabled}>Anterior</span>
-                )}
-
-                {paginationItems(page, searchResult.pagination.total_pages).map((pageItem) => (
-                  <Link
-                    key={pageItem}
-                    href={buildQueryHref(query, pageItem)}
-                    className={
-                      pageItem === page
-                        ? `${styles.pageButton} ${styles.pageButtonActive}`
-                        : styles.pageButton
-                    }
-                  >
-                    {pageItem}
-                  </Link>
-                ))}
-
-                {searchResult.pagination.has_next_page ? (
-                  <Link
-                    className={styles.pageButton}
-                    href={buildQueryHref(query, page + 1)}
-                  >
-                    Próxima
-                  </Link>
-                ) : (
-                  <span className={styles.pageButtonDisabled}>Próxima</span>
-                )}
-              </nav>
-            )}
+            <Pagination
+              currentPage={page}
+              totalPages={searchResult.pagination.total_pages}
+              getHref={(p) => buildQueryHref(query, p)}
+              ariaLabel="Paginação da busca"
+            />
           </>
         )}
 

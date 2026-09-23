@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import styles from "../../page.module.css";
 import { getCategoryBooks } from "@/lib/mec-api";
 import BookCard from "@/components/BookCard";
+import Header from "@/components/Header";
+import Pagination from "@/components/Pagination";
 
 type CategoryPageProps = {
   params: Promise<{
@@ -22,12 +23,6 @@ function parsePage(value?: string): number {
   return Math.floor(parsed);
 }
 
-function paginationItems(current: number, total: number): number[] {
-  const start = Math.max(1, current - 3);
-  const end = Math.min(total, current + 3);
-  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-}
-
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
   const sParams = await searchParams;
@@ -44,69 +39,33 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const totalPages = Math.ceil(totalItems / 12);
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <div style={{ marginBottom: 12 }}>
-          <Link href="/" className={styles.backLink || ""} style={{ color: "#1351b4", textDecoration: "none", fontWeight: 500 }}>
-            ← Voltar para a busca
-          </Link>
-        </div>
+    <>
+      <Header />
+      <div className={styles.page}>
+        <main className={styles.main}>
+          <section className={styles.heroWithResults}>
+            <h1 className={styles.categoryHeading}>
+              {categoryData.name}
+            </h1>
+            <p className={styles.resultsSummary}>
+              {totalItems} livros encontrados nesta categoria
+            </p>
+          </section>
 
-        <section className={styles.heroWithResults}>
-          <h1 style={{ fontSize: "1.6rem", fontWeight: 700, color: "#1c2536", margin: "0 0 6px" }}>
-            {categoryData.name}
-          </h1>
-          <p className={styles.resultsSummary} style={{ margin: 0 }}>
-            {totalItems} livros encontrados nesta categoria
-          </p>
-        </section>
-
-        <section className={styles.grid}>
-          {categoryData.books.map((book, index) => (
-            <BookCard key={book.id} book={book} priority={index < 4} />
-          ))}
-        </section>
-
-        {totalPages > 1 && (
-          <nav className={styles.pagination} aria-label="Paginação da categoria">
-            {page > 1 ? (
-              <Link
-                className={styles.pageButton}
-                href={`/categoria/${slug}?page=${page - 1}`}
-              >
-                Anterior
-              </Link>
-            ) : (
-              <span className={styles.pageButtonDisabled}>Anterior</span>
-            )}
-
-            {paginationItems(page, totalPages).map((pageItem) => (
-              <Link
-                key={pageItem}
-                href={`/categoria/${slug}?page=${pageItem}`}
-                className={
-                  pageItem === page
-                    ? `${styles.pageButton} ${styles.pageButtonActive}`
-                    : styles.pageButton
-                }
-              >
-                {pageItem}
-              </Link>
+          <section className={styles.grid}>
+            {categoryData.books.map((book, index) => (
+              <BookCard key={book.id} book={book} priority={index < 4} />
             ))}
+          </section>
 
-            {page < totalPages ? (
-              <Link
-                className={styles.pageButton}
-                href={`/categoria/${slug}?page=${page + 1}`}
-              >
-                Próxima
-              </Link>
-            ) : (
-              <span className={styles.pageButtonDisabled}>Próxima</span>
-            )}
-          </nav>
-        )}
-      </main>
-    </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            getHref={(p) => `/categoria/${slug}?page=${p}`}
+            ariaLabel="Paginação da categoria"
+          />
+        </main>
+      </div>
+    </>
   );
 }

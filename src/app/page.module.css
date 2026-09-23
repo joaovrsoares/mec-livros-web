@@ -262,6 +262,57 @@
   align-items: center;
 }
 
+.noResultsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 20px;
+  background: #ffffff;
+  border: 1px solid #e3e9f6;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(19, 81, 180, 0.04);
+  margin-top: 12px;
+  width: 100%;
+}
+
+.noResultsIcon {
+  font-size: 2.8rem;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.noResultsTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1c2536;
+  margin-bottom: 8px;
+}
+
+.noResultsText {
+  color: #5b657e;
+  font-size: 0.96rem;
+  max-width: 480px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.noResultsSuggestions {
+  text-align: left;
+  background: #f7f9fd;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-size: 0.88rem;
+  color: #4f556d;
+  line-height: 1.6;
+}
+
+.noResultsSuggestions ul {
+  padding-left: 20px;
+  margin-top: 6px;
+}
+
 .pagination {
   display: flex;
   flex-wrap: wrap;
@@ -285,12 +336,29 @@
   padding: 0 12px;
   font-size: 0.92rem;
   background: #fff;
+  transition: all 0.15s ease;
+}
+
+.pageButton:hover {
+  border-color: #1351b4;
+  color: #1351b4;
+}
+
+.pageButton:focus-visible {
+  outline: 2px solid #1351b4;
+  outline-offset: 2px;
 }
 
 .pageButtonActive {
   background: #1351b4;
   color: #fff;
   border-color: #1351b4;
+}
+
+.pageButtonActive:hover {
+  background: #0d47a1;
+  color: #fff;
+  border-color: #0d47a1;
 }
 
 @media (max-width: 900px) {
@@ -675,6 +743,18 @@
 .inlineCategorySelect:focus {
   border-color: #1351b4;
   background: #e8f0fe;
+}
+
+.selectPending {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.categoryHeading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1c2536;
+  margin: 0 0 6px;
 }
 
 .sliderTitle span {

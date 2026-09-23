@@ -25,10 +25,15 @@ export default function BookCard({
 
   return (
     <div className={styles.card}>
-      <Link href={`/livro/${book.id}`} className={styles.cardCoverWrap}>
+      <Link
+        href={`/livro/${book.id}`}
+        className={styles.cardCoverWrap}
+        tabIndex={-1}
+        aria-hidden="true"
+      >
         <Image
           src={getCoverUrl(book.cover_filename)}
-          alt={`Capa de ${book.title}`}
+          alt=""
           fill
           sizes="(max-width: 760px) 90px, 130px"
           className={styles.cardCover}

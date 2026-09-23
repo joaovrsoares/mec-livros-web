@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import styles from "./page.module.css";
 import DownloadButton from "@/components/DownloadButton";
+import Header from "@/components/Header";
 import { formatLanguage, getBookById, getCoverUrl } from "@/lib/mec-api";
 
 type BookDetailsProps = {
@@ -41,10 +42,20 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
   }
 
   return (
-    <main className={styles.page}>
-      <Link href="/" className={styles.backLink}>
-        ← Voltar para busca
-      </Link>
+    <>
+      <Header />
+      <main className={styles.page}>
+        <nav aria-label="Navegação estrutural" className={styles.breadcrumb}>
+          <Link href="/" className={styles.backLink}>
+            Início
+          </Link>
+          <span className={styles.breadcrumbSeparator} aria-hidden="true">
+            /
+          </span>
+          <span className={styles.breadcrumbCurrent} aria-current="page">
+            {book.title}
+          </span>
+        </nav>
 
       <section className={styles.content}>
         <div className={styles.coverWrap}>
@@ -94,5 +105,6 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
         <p>{book.description || "Sem descrição disponível."}</p>
       </section>
     </main>
-  );
+  </>
+);
 }
