@@ -146,10 +146,10 @@
   top: calc(100% + 6px);
   left: 0;
   min-width: 270px;
-  background: #ffffff;
-  border: 1px solid #dce3f2;
+  background: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(19, 81, 180, 0.2), 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 6px;
   z-index: 100;
   display: flex;
@@ -193,7 +193,7 @@
 
 .menuItem:hover,
 .menuItem:focus-visible {
-  background-color: #f0f5ff;
+  background-color: var(--menu-hover);
 }
 
 .menuItemContent {
@@ -207,27 +207,27 @@
 .formatName {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #1c2536;
+  color: var(--text-heading);
   flex-shrink: 0;
 }
 
 .menuItem:hover .formatName {
-  color: #1351b4;
+  color: var(--primary);
 }
 
 .formatTag {
   font-size: 0.76rem;
   font-weight: 500;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
   padding: 3px 8px;
   border-radius: 4px;
   white-space: nowrap;
 }
 
 .menuItem:hover .formatTag {
-  background: #e1ecfe;
-  color: #1351b4;
+  background: var(--bg-surface);
+  color: var(--primary);
 }
 
 .spinner {

@@ -25,6 +25,7 @@ export default function DownloadButton({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
+  const [downloadPhase, setDownloadPhase] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -89,6 +90,15 @@ export default function DownloadButton({
     setLoadingType(type);
     setErrorMessage(null);
     setSuccessMessage(null);
+    setDownloadPhase(type === "pdf" ? "Diagramando PDF..." : "Baixando EPUB...");
+
+    // For PDFs that take several seconds, give continuous helpful feedback
+    let phaseTimer: NodeJS.Timeout | null = null;
+    if (type === "pdf") {
+      phaseTimer = setTimeout(() => {
+        setDownloadPhase("Processando capítulos...");
+      }, 5000);
+    }
 
     const endpoint =
       type === "pdf"
@@ -109,6 +119,8 @@ export default function DownloadButton({
         setCountdown(validSeconds);
         setErrorMessage("Limite de downloads atingido, aguarde.");
         setLoadingType(null);
+        setDownloadPhase("");
+        if (phaseTimer) clearTimeout(phaseTimer);
         return;
       }
 
@@ -119,6 +131,8 @@ export default function DownloadButton({
           `Erro no download (${response.status} ${response.statusText}).`
         );
       }
+
+      setDownloadPhase("Salvando arquivo...");
 
       const disposition = response.headers.get("Content-Disposition");
       const authorAndTitle = [bookAuthors[0], bookTitle]
@@ -155,7 +169,9 @@ export default function DownloadButton({
           : "Não foi possível baixar o livro. Tente novamente mais tarde.";
       setErrorMessage(msg);
     } finally {
+      if (phaseTimer) clearTimeout(phaseTimer);
       setLoadingType(null);
+      setDownloadPhase("");
     }
   }
 
@@ -187,9 +203,7 @@ export default function DownloadButton({
           {loadingType ? (
             <>
               <span className={styles.spinner} aria-hidden="true" />
-              <span>
-                {loadingType === "pdf" ? "Baixando PDF..." : "Baixando EPUB..."}
-              </span>
+              <span>{downloadPhase || (loadingType === "pdf" ? "Baixando PDF..." : "Baixando EPUB...")}</span>
             </>
           ) : countdown > 0 ? (
             <span>Aguarde {countdown}s</span>

@@ -21,7 +21,7 @@
 }
 
 .backLink {
-  color: #1351b4;
+  color: var(--primary);
   font-weight: 500;
   text-decoration: none;
   transition: color 0.15s;
@@ -29,16 +29,16 @@
 
 .backLink:hover {
   text-decoration: underline;
-  color: #0d47a1;
+  color: var(--primary-hover);
 }
 
 .breadcrumbSeparator {
-  color: #a0aec0;
+  color: var(--text-caption);
   user-select: none;
 }
 
 .breadcrumbCurrent {
-  color: #4f556d;
+  color: var(--text-heading);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -57,7 +57,9 @@
   aspect-ratio: 2 / 3;
   border-radius: 12px;
   overflow: hidden;
-  background: #f1f4fb;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--card-shadow);
 }
 
 .cover {
@@ -72,16 +74,18 @@
 
 .title {
   font-size: 2rem;
+  color: var(--text-heading);
 }
 
 .author {
   font-size: 1.1rem;
-  color: #4f556d;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
 .meta {
   font-size: 0.96rem;
+  color: var(--text-caption);
 }
 
 .actions {
@@ -100,25 +104,29 @@
 }
 
 .downloadButton {
-  background: #0a5ddb;
-  color: #fff;
+  background: var(--primary);
+  color: var(--primary-contrast);
 }
 
 .disabledButton {
-  background: #e5e8f0;
-  color: #66708a;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
 }
 
 .descriptionBlock {
-  background: #fff;
-  border: 1px solid #e8ebf5;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 16px;
-  line-height: 1.55;
+  padding: 20px;
+  line-height: 1.6;
+  color: var(--text-main);
+  box-shadow: var(--card-shadow);
 }
 
 .descriptionBlock h2 {
   margin-bottom: 8px;
+  color: var(--text-heading);
 }
 
 @media (max-width: 900px) {

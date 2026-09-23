@@ -11,6 +11,7 @@ import {
   type MecCategoryBooksResponse,
 } from "@/lib/mec-api";
 import Pagination from "@/components/Pagination";
+import ThemeToggle from "@/components/ThemeToggle";
 import CategorySlider from "@/components/CategorySlider";
 import BookCard from "@/components/BookCard";
 
@@ -115,6 +116,9 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div className={styles.page}>
+      <div className={styles.topNav}>
+        <ThemeToggle />
+      </div>
       <main className={styles.main}>
         <section
           className={`${styles.hero} ${searchResult || categoryResult ? styles.heroWithResults : styles.heroCentered}`}

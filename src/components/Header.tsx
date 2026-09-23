@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import ThemeToggle from "./ThemeToggle";
 import styles from "./Header.module.css";
 
 export default function Header() {
@@ -16,22 +17,25 @@ export default function Header() {
             className={styles.logo}
           />
         </Link>
-        <form method="GET" action="/" className={styles.searchForm}>
-          <label htmlFor="header-search-input" className={styles.srOnly}>
-            Buscar livros por título ou autor
-          </label>
-          <input
-            id="header-search-input"
-            type="search"
-            name="query"
-            placeholder="Pesquise por título ou autor..."
-            className={styles.searchInput}
-            required
-          />
-          <button type="submit" className={styles.searchButton}>
-            Buscar
-          </button>
-        </form>
+        <div className={styles.headerActions}>
+          <form method="GET" action="/" className={styles.searchForm}>
+            <label htmlFor="header-search-input" className={styles.srOnly}>
+              Buscar livros por título ou autor
+            </label>
+            <input
+              id="header-search-input"
+              type="search"
+              name="query"
+              placeholder="Pesquise por título ou autor..."
+              className={styles.searchInput}
+              required
+            />
+            <button type="submit" className={styles.searchButton}>
+              Buscar
+            </button>
+          </form>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

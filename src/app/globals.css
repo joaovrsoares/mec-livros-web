@@ -1,6 +1,92 @@
 :root {
-  --background: #f7f8fb;
-  --foreground: #12131a;
+  /* Light Theme Palette */
+  --bg-page: #f7f8fb;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f0f5ff;
+  --bg-skeleton: linear-gradient(90deg, #eef2f9 25%, #e2e8f5 50%, #eef2f9 75%);
+  --bg-input: #ffffff;
+
+  --text-main: #12131a;
+  --text-heading: #1c2536;
+  --text-muted: #4f556d;
+  --text-caption: #5b657e;
+
+  --border-subtle: #e3e9f6;
+  --border-input: #dce3f2;
+  --border-focus: #1351b4;
+
+  --primary: #1351b4;
+  --primary-hover: #0d47a1;
+  --primary-contrast: #ffffff;
+
+  --card-shadow: 0 1px 4px rgba(19, 81, 180, 0.04);
+  --card-shadow-hover: 0 6px 20px rgba(19, 81, 180, 0.1);
+  --dropdown-bg: #ffffff;
+  --dropdown-border: #e3e9f6;
+  --menu-hover: #f0f5ff;
+
+  --logo-filter: none;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme Palette */
+  --bg-page: #0f131a;
+  --bg-surface: #181d28;
+  --bg-subtle: #202636;
+  --bg-skeleton: linear-gradient(90deg, #1e2433 25%, #273042 50%, #1e2433 75%);
+  --bg-input: #1a202c;
+
+  --text-main: #e6edf8;
+  --text-heading: #f0f4fc;
+  --text-muted: #a6b2c7;
+  --text-caption: #8d9bb0;
+
+  --border-subtle: #2a3346;
+  --border-input: #354056;
+  --border-focus: #3b82f6;
+
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-contrast: #ffffff;
+
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --dropdown-bg: #1c2230;
+  --dropdown-border: #2e374a;
+  --menu-hover: #262f42;
+
+  --logo-filter: invert(1) hue-rotate(180deg) brightness(1.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page: #0f131a;
+    --bg-surface: #181d28;
+    --bg-subtle: #202636;
+    --bg-skeleton: linear-gradient(90deg, #1e2433 25%, #273042 50%, #1e2433 75%);
+    --bg-input: #1a202c;
+
+    --text-main: #e6edf8;
+    --text-heading: #f0f4fc;
+    --text-muted: #a6b2c7;
+    --text-caption: #8d9bb0;
+
+    --border-subtle: #2a3346;
+    --border-input: #354056;
+    --border-focus: #3b82f6;
+
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-contrast: #ffffff;
+
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+    --dropdown-bg: #1c2230;
+    --dropdown-border: #2e374a;
+    --menu-hover: #262f42;
+
+    --logo-filter: invert(1) hue-rotate(180deg) brightness(1.2);
+  }
 }
 
 html,
@@ -13,11 +99,12 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--text-main);
+  background: var(--bg-page);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 * {
