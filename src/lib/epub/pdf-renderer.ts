@@ -204,7 +204,8 @@ function sanitizePdfOutlines(pdfDoc: PDFDocument, candidateTitles?: Set<string>)
     if (next) traverse(pdfDoc.context.lookup(next));
   }
 
-  const first = outlines.get(PDFName.of("First"));
+  const outlinesDict = outlines as any;
+  const first = outlinesDict.get ? outlinesDict.get(PDFName.of("First")) : null;
   if (first) traverse(pdfDoc.context.lookup(first));
 }
 
