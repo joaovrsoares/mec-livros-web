@@ -112,61 +112,187 @@ export async function inlineChapterAssets(
 
   processed = processed.replace(/<link\b[^>]*rel=["']stylesheet["'][^>]*>\s*/gi, "");
 
-  processed = processed.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, (fullMatch, cssBody) => {
+  // Extract <style> tags from HTML so chapter-specific inline styles are preserved
+  const inlineStyles: string[] = [];
+  processed = processed.replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, (_fullMatch, cssBody) => {
     const parsed = parseAndSanitizeCss(cssBody, options);
-    return formatChapterStyleBlock(parsed, options?.chapterAnchorId);
+    const formatted = formatChapterStyleBlock(parsed, options?.chapterAnchorId);
+    if (formatted) inlineStyles.push(formatted);
+    return "";
   });
 
-  if (linkStylesheets.length > 0) {
-    if (processed.includes("</head>")) {
-      processed = processed.replace("</head>", `${linkStylesheets.join("\n")}\n</head>`);
-    } else {
-      processed = linkStylesheets.join("\n") + "\n" + processed;
+  // Extract <body> content if present
+  const bodyMatch = processed.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  let bodyContent = bodyMatch ? bodyMatch[1] : processed;
+
+  // Prepend linked stylesheets first, then inline styles (inline wins over linked)
+  const allStyles = [...linkStylesheets, ...inlineStyles];
+  if (allStyles.length > 0) {
+    bodyContent = allStyles.join("\n") + "\n" + bodyContent;
+  }
+
+  // Strip any rogue @page rules
+  bodyContent = bodyContent.replace(/@page\b[^{]*\{[^}]*\}/gi, "");
+
+  // 1. Convert SVG tags wrapping <image> / <svg:image> to <img> tags
+  bodyContent = bodyContent.replace(
+    /<svg\b[^>]*>(?:[\s\S]*?)<(?:svg:)?image\b([^>]*?)(?:\/?>|>(?:[\s\S]*?)<\/(?:svg:)?image>)(?:[\s\S]*?)<\/svg>/gi,
+    (_match, attrs) => {
+      const cleanAttrs = attrs.replace(/\b(?:width|height)=["'][^"']*["']/gi, "");
+      return `<img ${cleanAttrs} class="epub-cover-img" />`;
+    }
+  );
+
+  // 2. Convert standalone <image> / <svg:image> tags to <img> tags
+  bodyContent = bodyContent.replace(
+    /<(?:svg:)?image\b([^>]*?)(?:\/?>|>(?:[\s\S]*?)<\/(?:svg:)?image>)/gi,
+    (_match, attrs) => `<img ${attrs} />`
+  );
+
+  // 3. In <img> tags, if xlink:href or href is used instead of src, convert to src
+  bodyContent = bodyContent.replace(
+    /<img\b([^>]*?)(?:xlink:href|href)=["']([^"']+)["']([^>]*?)>/gi,
+    (match, before, hrefVal, after) => {
+      if (/\bsrc=/i.test(match)) return match;
+      return `<img ${before} src="${hrefVal}" ${after}>`;
+    }
+  );
+
+  // 4. Pre-read and convert all referenced local images to Base64 Data URIs
+  const imgTagRegex = /<img\b([^>]*?)>/gi;
+  const imageSrcs = new Set<string>();
+  let tagMatch: RegExpExecArray | null;
+
+  while ((tagMatch = imgTagRegex.exec(bodyContent)) !== null) {
+    const attrs = tagMatch[1];
+    const srcMatch = attrs.match(/\bsrc=["']([^"']+)["']/i);
+    if (srcMatch && srcMatch[1]) {
+      const src = srcMatch[1].trim();
+      if (!src.startsWith("data:") && !src.startsWith("http://") && !src.startsWith("https://")) {
+        imageSrcs.add(src);
+      }
     }
   }
 
-  const srcRegex = /(<img|<image|<svg\b[^>]*>[\s\S]*?<image)\s+([^>]*)\bsrc=["']([^"']+)["']/gi;
-  const hrefSvgRegex = /(<image\s+[^>]*)\bhref=["']([^"']+)["']/gi;
-  const xlinkHrefSvgRegex = /(<image\s+[^>]*)\bxlink:href=["']([^"']+)["']/gi;
-
-  const replaceUrl = async (full: string, prefix: string, attrs: string, src: string, isHref = false) => {
-    if (src.startsWith("data:") || src.startsWith("http")) return full;
+  const dataUriMap = new Map<string, string>();
+  for (const src of imageSrcs) {
     const cleanSrc = src.split("#")[0].split("?")[0];
     const imagePath = normalizeZipPath(chapterBaseDir, cleanSrc);
     const file = zip.file(imagePath);
     if (file) {
       const imgBuffer = await file.async("nodebuffer");
       const mimeType = getMimeType(imagePath);
-      const dataUri = `data:${mimeType};base64,${imgBuffer.toString("base64")}`;
-      if (isHref) {
-        return `${prefix} href="${dataUri}"`;
-      } else {
-        return `${prefix} ${attrs} src="${dataUri}"`;
-      }
+      dataUriMap.set(src, `data:${mimeType};base64,${imgBuffer.toString("base64")}`);
     }
-    return full;
-  };
-
-  const srcMatches = [...processed.matchAll(srcRegex)];
-  for (const m of srcMatches) {
-    const replacement = await replaceUrl(m[0], m[1], m[2] || "", m[3]);
-    processed = processed.replace(m[0], replacement);
   }
 
-  const hrefMatches = [...processed.matchAll(hrefSvgRegex)];
-  for (const m of hrefMatches) {
-    const replacement = await replaceUrl(m[0], m[1], "", m[2], true);
-    processed = processed.replace(m[0], replacement);
-  }
+  // 5. Replace src and sanitize alt in <img> tags
+  bodyContent = bodyContent.replace(/<img\b([^>]*?)>/gi, (_match, attrs) => {
+    const srcMatch = attrs.match(/\bsrc=["']([^"']+)["']/i);
+    if (!srcMatch) return `<img ${attrs}>`;
 
-  const xlinkMatches = [...processed.matchAll(xlinkHrefSvgRegex)];
-  for (const m of xlinkMatches) {
-    const replacement = await replaceUrl(m[0], m[1], "", m[2], true);
-    processed = processed.replace(m[0], replacement.replace("href=", "xlink:href="));
-  }
+    const origSrc = srcMatch[1].trim();
+    const resolvedDataUri = dataUriMap.get(origSrc) || origSrc;
+    let newAttrs = attrs.replace(/\bsrc=["'][^"']+["']/i, `src="${resolvedDataUri}"`);
 
-  const bodyMatch = processed.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-  return bodyMatch ? bodyMatch[1] : processed;
+    // Sanitize alt attribute: if alt contains image file paths, data URIs, or is identical to src, clean it
+    newAttrs = newAttrs.replace(/\balt=["']([^"']*)["']/i, (_altMatch: string, altVal: string) => {
+      const trimmed = altVal.trim();
+      if (
+        trimmed.startsWith("data:") ||
+        trimmed === origSrc ||
+        /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(trimmed)
+      ) {
+        return 'alt=""';
+      }
+      return `alt="${altVal}"`;
+    });
+
+    return `<img ${newAttrs}>`;
+  });
+
+  // 6. Remove any trailing XHTML </img> tags
+  bodyContent = bodyContent.replace(/<\/img>/gi, "");
+
+  // 7. Remove problematic fixed-heights / absolute positioning styles in inline attributes
+  bodyContent = bodyContent.replace(
+    /style=["'][^"']*(?:height\s*:\s*(?:100%|98%|95%)|position\s*:\s*absolute|transform\s*:)[^"']*["']/gi,
+    ""
+  );
+
+  // 8. Remove EPUB navigation landmarks / page-lists to prevent outline pollution
+  bodyContent = bodyContent.replace(
+    /<nav\b[^>]*epub:type=["'](?:landmarks|page-list)["'][^>]*>[\s\S]*?<\/nav>/gi,
+    ""
+  );
+
+  // 9. Ensure anchor tags with name="..." also have id="..." for modern PDF anchor targeting
+  bodyContent = bodyContent.replace(
+    /<a\b([^>]*?)name=["']([^"']+)["']([^>]*?)>/gi,
+    (match, before, nameVal, after) => {
+      if (/\bid=/i.test(match)) return match;
+      return `<a ${before}id="${nameVal}" name="${nameVal}"${after}>`;
+    }
+  );
+
+  // 10. Rewrite relative links to internal PDF anchor jumps
+  bodyContent = bodyContent.replace(
+    /<a\b([^>]*?)href=["']([^"']+)["']([^>]*?)>/gi,
+    (match, before, hrefVal, after) => {
+      const trimmed = hrefVal.trim();
+      if (
+        trimmed.startsWith("http://") ||
+        trimmed.startsWith("https://") ||
+        trimmed.startsWith("mailto:") ||
+        trimmed.startsWith("tel:") ||
+        trimmed.startsWith("javascript:") ||
+        trimmed.startsWith("data:") ||
+        trimmed.startsWith("#")
+      ) {
+        return match;
+      }
+
+      const [pathPart, hashPart] = trimmed.split("#");
+      if (!pathPart) {
+        return hashPart ? `<a ${before}href="#${hashPart}"${after}>` : match;
+      }
+
+      const ext = pathPart.split(".").pop()?.toLowerCase() || "";
+      if (!["xhtml", "html", "htm", "xml"].includes(ext)) {
+        return match;
+      }
+
+      const targetZipPath = normalizeZipPath(chapterBaseDir, pathPart);
+      if (hashPart) {
+        return `<a ${before}href="#${hashPart}"${after}>`;
+      }
+      const targetAnchorId = getChapterAnchorId(targetZipPath);
+      return `<a ${before}href="#${targetAnchorId}"${after}>`;
+    }
+  );
+
+  // 11. Ensure headings have non-breaking spaces around <br> and child tags
+  bodyContent = bodyContent.replace(
+    /<(h[1-6])\b([^>]*)>([\s\S]*?)<\/\1>/gi,
+    (match, tag, attrs, content) => {
+      let fixedContent = content
+        .replace(/(Parte\s+\d+)(?!:)/gi, "$1:")
+        .replace(/<br\s*\/?>/gi, "&#160;<br/>")
+        .replace(/<\/(small|span|em|strong|b|i)>/gi, "</$1>&#160;");
+      fixedContent = fixedContent
+        .replace(/(?:&#160;)+/g, "&#160;")
+        .replace(/^&#160;/, "");
+      return `<${tag}${attrs}>${fixedContent}</${tag}>`;
+    }
+  );
+
+  // 12. Wrap paragraph-initial dialogue dashes so the gap after the dash stays constant
+  bodyContent = bodyContent.replace(
+    /<p\b([^>]*)>((?:\s|<(?!\/?p[\s>/])[^>]+>)*?)(—|–|―|&mdash;|&ndash;|&#8212;|&#8211;|&#x2014;|&#x2013;)((?:\s|&nbsp;|&#160;|&#32;)*)/gi,
+    (_m, attrs, prefix, dash) => `<p${attrs}>${prefix}<span class="epub-dialog-dash">${dash}</span>`
+  );
+
+  return bodyContent;
 }
 
 export function bridgeDemotedHeadingCss(cssText: string): string {

@@ -213,6 +213,7 @@ export function buildUnifiedHtml(
       display: none !important;
     }
     .epub-chapter {
+      position: relative;
       page-break-before: always;
       break-before: page;
       clear: both;
