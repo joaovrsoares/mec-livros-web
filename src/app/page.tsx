@@ -208,7 +208,7 @@ export default async function Home({ searchParams }: HomeProps) {
           )}
         </main>
       </div>
-      <Footer />
+      <Footer totalBooks={categoriesData?.total_books} />
     </>
   );
 }

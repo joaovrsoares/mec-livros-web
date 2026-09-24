@@ -1,8 +1,27 @@
 import Link from "next/link";
 import styles from "./Footer.module.css";
+import { getCategoriesPreview } from "@/lib/mec-api";
 
-export default function Footer() {
+type FooterProps = {
+  totalBooks?: number;
+};
+
+export default async function Footer({ totalBooks }: FooterProps) {
   const currentYear = new Date().getFullYear();
+
+  let bookCount = totalBooks;
+  if (!bookCount || bookCount <= 0) {
+    try {
+      const data = await getCategoriesPreview();
+      if (data?.total_books && data.total_books > 0) {
+        bookCount = data.total_books;
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
+  const formattedCount = bookCount && bookCount > 0 ? bookCount.toLocaleString("pt-BR") : null;
 
   return (
     <footer className={styles.footer}>
@@ -20,7 +39,15 @@ export default function Footer() {
         <div className={styles.infoColumn}>
           <h3 className={styles.columnTitle}>Sobre o Acervo</h3>
           <p className={styles.statsText}>
-            Mais de <strong>26.000 livros</strong> disponíveis gratuitamente em domínio público, literatura infantojuvenil, clássicos e obras acadêmicas.
+            {formattedCount ? (
+              <>
+                Atualmente com <strong>{formattedCount} livros</strong> disponíveis gratuitamente em domínio público, literatura infantojuvenil, clássicos e obras acadêmicas.
+              </>
+            ) : (
+              <>
+                Mais de <strong>26.000 livros</strong> disponíveis gratuitamente em domínio público, literatura infantojuvenil, clássicos e obras acadêmicas.
+              </>
+            )}
           </p>
         </div>
 

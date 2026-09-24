@@ -514,8 +514,8 @@
   max-width: 100%;
   box-sizing: border-box;
   border-radius: 14px;
-  background: #fff;
-  border: 1px solid #e3e9f6;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   padding: 14px 16px;
   display: flex;
   flex-direction: row;
