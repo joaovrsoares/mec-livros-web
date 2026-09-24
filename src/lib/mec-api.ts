@@ -7,8 +7,10 @@ export type MecBook = {
   authors: string[];
   cover_filename: string;
   isbn?: string;
+  isbn13?: string;
   description?: string;
   publisher?: string;
+  publisher_label?: string;
   published_date?: string;
   page_count?: number;
   categories?: string[];
@@ -20,6 +22,10 @@ export type MecBook = {
   has_epub?: boolean;
   epub_filename?: string;
   size?: number;
+  is_public_domain?: boolean;
+  literary_movement?: string | null;
+  genre?: string | null;
+  nationality?: string | null;
 };
 
 export type MecSearchResponse = {

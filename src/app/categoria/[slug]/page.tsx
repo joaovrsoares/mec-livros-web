@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import styles from "../../page.module.css";
@@ -44,6 +45,18 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       <Header />
       <div className={styles.page}>
         <main className={styles.main}>
+          <nav aria-label="Navegação estrutural" className={styles.breadcrumb}>
+            <Link href="/" className={styles.backLink}>
+              Início
+            </Link>
+            <span className={styles.breadcrumbSeparator} aria-hidden="true">
+              /
+            </span>
+            <span className={styles.breadcrumbCurrent} aria-current="page">
+              {categoryData.name}
+            </span>
+          </nav>
+
           <section className={styles.heroWithResults}>
             <h1 className={styles.categoryHeading}>
               {categoryData.name}

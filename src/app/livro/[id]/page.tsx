@@ -33,6 +33,14 @@ function formatDate(value?: string): string {
   return value;
 }
 
+function formatFileSize(bytes?: number): string | null {
+  if (!bytes || bytes <= 0) return null;
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default async function BookDetailsPage({ params }: BookDetailsProps) {
   const { id } = await params;
   let book;
@@ -41,6 +49,10 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
   } catch {
     notFound();
   }
+
+  const publisherLabel = book.publisher_label || "Editora";
+  const fileSize = formatFileSize(book.size);
+  const isbn = book.isbn13 || book.isbn;
 
   return (
     <>
@@ -58,48 +70,96 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
           </span>
         </nav>
 
-      <section className={styles.content}>
-        <div className={styles.coverWrap}>
-          <Image
-            src={getCoverUrl(book.cover_filename)}
-            alt={`Capa de ${book.title}`}
-            fill
-            sizes="(max-width: 900px) 100vw, 400px"
-            className={styles.cover}
-            priority
-          />
-        </div>
-
-        <div className={styles.details}>
-          <h1 className={styles.title}>{book.title}</h1>
-          <p className={styles.author}>{book.authors?.join(", ") || "Autor desconhecido"}</p>
-          <p className={styles.meta}>
-            <strong>Editora:</strong> {book.publisher || "Não informado"}
-          </p>
-          <p className={styles.meta}>
-            <strong>Publicado em:</strong> {formatDate(book.published_date)}
-          </p>
-          <p className={styles.meta}>
-            <strong>Páginas:</strong> {book.page_count || 0} (aprox.)
-          </p>
-          <p className={styles.meta}>
-            <strong>Idioma:</strong> {formatLanguage(book.language)}
-          </p>
-          <p className={styles.meta}>
-            <strong>Categorias:</strong>{" "}
-            {book.categories?.length ? book.categories.join(", ") : "Não informado"}
-          </p>
-
-          <div className={styles.actions}>
-            <DownloadButton
-              bookId={book.id}
-              bookTitle={book.title}
-              bookAuthors={book.authors}
-              hasEpub={book.has_epub}
+        <section className={styles.content}>
+          <div className={styles.coverWrap}>
+            <Image
+              src={getCoverUrl(book.cover_filename)}
+              alt={`Capa de ${book.title}`}
+              fill
+              sizes="(max-width: 900px) 100vw, 400px"
+              className={styles.cover}
+              priority
             />
           </div>
-        </div>
-      </section>
+
+          <div className={styles.details}>
+            <h1 className={styles.title}>{book.title}</h1>
+            <p className={styles.author}>{book.authors?.join(", ") || "Autor desconhecido"}</p>
+
+            {book.is_public_domain && (
+              <p className={styles.meta}>
+                <strong>Licença:</strong> Domínio Público
+              </p>
+            )}
+
+            <p className={styles.meta}>
+              <strong>{publisherLabel}:</strong> {book.publisher || "Não informado"}
+            </p>
+
+            <p className={styles.meta}>
+              <strong>Publicado em:</strong> {formatDate(book.published_date)}
+            </p>
+
+            <p className={styles.meta}>
+              <strong>Páginas:</strong> {book.page_count || 0} (aprox.)
+            </p>
+
+            <p className={styles.meta}>
+              <strong>Idioma:</strong> {formatLanguage(book.language)}
+            </p>
+
+            {book.genre && (
+              <p className={styles.meta}>
+                <strong>Gênero:</strong> {book.genre}
+              </p>
+            )}
+
+            {book.literary_movement && (
+              <p className={styles.meta}>
+                <strong>Movimento literário:</strong> {book.literary_movement}
+              </p>
+            )}
+
+            {book.nationality && (
+              <p className={styles.meta}>
+                <strong>Nacionalidade:</strong> {book.nationality}
+              </p>
+            )}
+
+            <p className={styles.meta}>
+              <strong>Categorias:</strong>{" "}
+              {book.categories?.length ? book.categories.join(", ") : "Não informado"}
+            </p>
+
+            {isbn && (
+              <p className={styles.meta}>
+                <strong>ISBN:</strong> {isbn}
+              </p>
+            )}
+
+            {fileSize && (
+              <p className={styles.meta}>
+                <strong>Tamanho do arquivo:</strong> {fileSize}
+              </p>
+            )}
+
+            {typeof book.view_count === "number" && book.view_count > 0 && (
+              <p className={styles.meta}>
+                <strong>Acessos no acervo:</strong> {book.view_count.toLocaleString("pt-BR")}
+              </p>
+            )}
+
+            <div className={styles.actions}>
+              <DownloadButton
+                bookId={book.id}
+                bookTitle={book.title}
+                bookAuthors={book.authors}
+                hasEpub={book.has_epub}
+                variant="rounded"
+              />
+            </div>
+          </div>
+        </section>
 
       <section className={styles.descriptionBlock}>
         <h2>Descrição</h2>
