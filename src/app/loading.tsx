@@ -1,9 +1,8 @@
 "use client";
 
 import { Suspense } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import Header from "@/components/Header";
 import styles from "./page.module.css";
 
 function LoadingContent() {
@@ -12,144 +11,86 @@ function LoadingContent() {
   const isSearchQuery = Boolean(query);
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <section className={`${styles.hero} ${styles.heroWithResults}`}>
-          <h1 className={styles.srOnly}>Livraria</h1>
-          <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
-            <Image
-              src="/logo.svg"
-              alt="Livraria"
-              width={280}
-              height={62}
-              priority
-              className={styles.logo}
-            />
-          </Link>
+    <>
+      <Header defaultQuery={query} />
+      <div className={styles.page}>
+        <main className={styles.main}>
+          {isSearchQuery ? (
+            <>
+              <div className={styles.resultsSummarySkeleton} />
 
-          <form method="GET" className={styles.searchForm}>
-            <input
-              type="search"
-              name="query"
-              defaultValue={query}
-              placeholder="Pesquise por título ou autor"
-              className={styles.searchInput}
-              required
-            />
-            <button type="submit" className={styles.searchButton}>
-              Buscar
-            </button>
-          </form>
-        </section>
-
-        {isSearchQuery ? (
-          <>
-            <div className={styles.resultsSummarySkeleton} />
-
-            <section className={styles.grid}>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <div key={index} className={styles.cardSkeleton}>
-                  <div className={styles.cardCoverWrapSkeleton} />
-                  <div className={styles.cardBodySkeleton}>
-                    <div className={styles.titleSkeleton} />
-                    <div className={styles.authorSkeleton} />
-                    <div className={styles.metaSkeleton} />
-                    <div className={styles.metaSkeleton} style={{ width: "45%" }} />
+              <section className={styles.grid}>
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <div key={index} className={styles.cardSkeleton}>
+                    <div className={styles.cardCoverWrapSkeleton} />
+                    <div className={styles.cardBodySkeleton}>
+                      <div className={styles.titleSkeleton} />
+                      <div className={styles.authorSkeleton} />
+                      <div className={styles.metaSkeleton} />
+                      <div className={styles.metaSkeleton} style={{ width: "45%" }} />
+                    </div>
                   </div>
+                ))}
+              </section>
+            </>
+          ) : (
+            <div className={styles.categoriesContainer}>
+              <div className={styles.sliderHeader}>
+                <div className={styles.sliderTitleWrapper}>
+                  <div className={styles.inlineSelectSkeleton} />
                 </div>
-              ))}
-            </section>
-          </>
-        ) : (
-          <div className={styles.sliderContainer}>
-            <div className={styles.sliderHeader}>
-              <div className={styles.sliderTitleWrapper}>
-                <h2 className={styles.sliderTitle}>Recomendações:</h2>
-                <div className={styles.inlineSelectSkeleton} />
-              </div>
-              <div className={styles.sliderControls}>
-                <div className={styles.sliderArrowSkeleton} />
-                <div className={styles.sliderArrowSkeleton} />
-              </div>
-            </div>
-
-            <div className={styles.sliderTrack}>
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className={styles.sliderCardSkeleton}>
-                  <div className={styles.coverWrapSkeleton} />
-                  <div className={styles.titleSkeleton} />
-                  <div className={styles.authorSkeleton} />
+                <div className={styles.sliderControls}>
+                  <div className={styles.sliderArrowSkeleton} />
+                  <div className={styles.sliderArrowSkeleton} />
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
-
-function FallbackLoading() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <section className={`${styles.hero} ${styles.heroWithResults}`}>
-          <h1 className={styles.srOnly}>Livraria</h1>
-          <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
-            <Image
-              src="/logo.svg"
-              alt="Livraria"
-              width={280}
-              height={62}
-              priority
-              className={styles.logo}
-            />
-          </Link>
-
-          <form method="GET" className={styles.searchForm}>
-            <input
-              type="search"
-              name="query"
-              placeholder="Pesquise por título ou autor"
-              className={styles.searchInput}
-              required
-            />
-            <button type="submit" className={styles.searchButton}>
-              Buscar
-            </button>
-          </form>
-        </section>
-
-        <div className={styles.sliderContainer}>
-          <div className={styles.sliderHeader}>
-            <div className={styles.sliderTitleWrapper}>
-              <h2 className={styles.sliderTitle}>Recomendações:</h2>
-              <div className={styles.inlineSelectSkeleton} />
-            </div>
-            <div className={styles.sliderControls}>
-              <div className={styles.sliderArrowSkeleton} />
-              <div className={styles.sliderArrowSkeleton} />
-            </div>
-          </div>
-
-          <div className={styles.sliderTrack}>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className={styles.sliderCardSkeleton}>
-                <div className={styles.coverWrapSkeleton} />
-                <div className={styles.titleSkeleton} />
-                <div className={styles.authorSkeleton} />
               </div>
-            ))}
-          </div>
-        </div>
-      </main>
-    </div>
+
+              <div className={styles.sliderTrack}>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className={styles.sliderCardSkeleton}>
+                    <div className={styles.coverWrapSkeleton} />
+                    <div className={styles.cardBodySkeleton}>
+                      <div className={styles.titleSkeleton} />
+                      <div className={styles.authorSkeleton} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    </>
   );
 }
 
 export default function Loading() {
   return (
-    <Suspense fallback={<FallbackLoading />}>
+    <Suspense
+      fallback={
+        <>
+          <Header />
+          <div className={styles.page}>
+            <main className={styles.main}>
+              <div className={styles.categoriesContainer}>
+                <div className={styles.sliderHeader}>
+                  <div className={styles.sliderTitleWrapper}>
+                    <div className={styles.inlineSelectSkeleton} />
+                  </div>
+                </div>
+                <div className={styles.sliderTrack}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className={styles.sliderCardSkeleton}>
+                      <div className={styles.coverWrapSkeleton} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </main>
+          </div>
+        </>
+      }
+    >
       <LoadingContent />
     </Suspense>
   );

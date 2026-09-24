@@ -1,5 +1,3 @@
-import Link from "next/link";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import styles from "./page.module.css";
 import {
@@ -11,7 +9,7 @@ import {
   type MecCategoryBooksResponse,
 } from "@/lib/mec-api";
 import Pagination from "@/components/Pagination";
-import ThemeToggle from "@/components/ThemeToggle";
+import Header from "@/components/Header";
 import CategorySlider from "@/components/CategorySlider";
 import BookCard from "@/components/BookCard";
 
@@ -115,101 +113,67 @@ export default async function Home({ searchParams }: HomeProps) {
   const activeCategorySlug = categoryParam || (categoryResult?.slug ?? "ficcao-literaria");
 
   return (
-    <div className={styles.page}>
-      <div className={styles.topNav}>
-        <ThemeToggle />
-      </div>
-      <main className={styles.main}>
-        <section
-          className={`${styles.hero} ${searchResult || categoryResult ? styles.heroWithResults : styles.heroCentered}`}
-        >
-          <h1 className={styles.srOnly}>Livraria</h1>
-          <Link href="/" className={styles.logoLink} aria-label="Ir para a home">
-            <Image
-              src="/logo.svg"
-              alt="Livraria"
-              width={280}
-              height={62}
-              priority
-              className={styles.logo}
-            />
-          </Link>
-
-          <form method="GET" className={styles.searchForm}>
-            <label htmlFor="home-search-input" className={styles.srOnly}>
-              Pesquise por título ou autor
-            </label>
-            <input
-              id="home-search-input"
-              type="search"
-              name="query"
-              defaultValue={query}
-              placeholder="Pesquise por título ou autor"
-              className={styles.searchInput}
-              required
-            />
-            <button type="submit" className={styles.searchButton}>
-              Buscar
-            </button>
-          </form>
-
+    <>
+      <Header defaultQuery={query} />
+      <div className={styles.page}>
+        <main className={styles.main}>
           {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
-        </section>
 
-        {/* Text Search Results (Grid with pagination) */}
-        {query && searchResult && searchResult.books.length === 0 && (
-          <section className={styles.noResultsContainer}>
-            <div className={styles.noResultsIcon} aria-hidden="true">
-              🔍
-            </div>
-            <h2 className={styles.noResultsTitle}>Nenhum livro encontrado</h2>
-            <p className={styles.noResultsText}>
-              Não encontramos resultados para &ldquo;<strong>{query}</strong>&rdquo;.
-            </p>
-            <div className={styles.noResultsSuggestions}>
-              <strong>Dicas de busca:</strong>
-              <ul>
-                <li>Verifique se o nome do autor ou título foi digitado corretamente.</li>
-                <li>Tente usar termos mais genéricos ou palavras-chave diferentes.</li>
-                <li>Você também pode buscar diretamente colando o ID de 9 dígitos do livro.</li>
-              </ul>
-            </div>
-          </section>
-        )}
-
-        {searchResult && searchResult.books.length > 0 && (
-          <>
-            <p className={styles.resultsSummary}>
-              Busca: <strong>{searchResult.query}</strong> •{" "}
-              {searchResult.pagination.total_items} resultados
-            </p>
-
-            <section className={styles.grid}>
-              {searchResult.books.map((book, index) => (
-                <BookCard key={book.id} book={book} priority={index < 4} />
-              ))}
+          {/* Text Search Results (Grid with pagination) */}
+          {query && searchResult && searchResult.books.length === 0 && (
+            <section className={styles.noResultsContainer}>
+              <div className={styles.noResultsIcon} aria-hidden="true">
+                🔍
+              </div>
+              <h2 className={styles.noResultsTitle}>Nenhum livro encontrado</h2>
+              <p className={styles.noResultsText}>
+                Não encontramos resultados para &ldquo;<strong>{query}</strong>&rdquo;.
+              </p>
+              <div className={styles.noResultsSuggestions}>
+                <strong>Dicas de busca:</strong>
+                <ul>
+                  <li>Verifique se o nome do autor ou título foi digitado corretamente.</li>
+                  <li>Tente usar termos mais genéricos ou palavras-chave diferentes.</li>
+                  <li>Você também pode buscar diretamente colando o ID de 9 dígitos do livro.</li>
+                </ul>
+              </div>
             </section>
+          )}
 
-            <Pagination
-              currentPage={page}
-              totalPages={searchResult.pagination.total_pages}
-              getHref={(p) => buildQueryHref(query, p)}
-              ariaLabel="Paginação da busca"
+          {searchResult && searchResult.books.length > 0 && (
+            <>
+              <p className={styles.resultsSummary}>
+                Busca: <strong>{searchResult.query}</strong> •{" "}
+                {searchResult.pagination.total_items} resultados
+              </p>
+
+              <section className={styles.grid}>
+                {searchResult.books.map((book, index) => (
+                  <BookCard key={book.id} book={book} priority={index < 4} />
+                ))}
+              </section>
+
+              <Pagination
+                currentPage={page}
+                totalPages={searchResult.pagination.total_pages}
+                getHref={(p) => buildQueryHref(query, p)}
+                ariaLabel="Paginação da busca"
+              />
+            </>
+          )}
+
+          {/* Home Recommendations (Category Slider of 12 books + Inline Dropdown) */}
+          {!query && categoryResult && categoryResult.books.length > 0 && (
+            <CategorySlider
+              books={categoryResult.books}
+              categorySlug={categoryResult.slug}
+              categoryName={categoryResult.name}
+              categories={categoriesList}
+              activeSlug={activeCategorySlug}
             />
-          </>
-        )}
-
-        {/* Home Recommendations (Category Slider of 12 books + Inline Dropdown) */}
-        {!query && categoryResult && categoryResult.books.length > 0 && (
-          <CategorySlider
-            books={categoryResult.books}
-            categorySlug={categoryResult.slug}
-            categoryName={categoryResult.name}
-            categories={categoriesList}
-            activeSlug={activeCategorySlug}
-          />
-        )}
-      </main>
-    </div>
+          )}
+        </main>
+      </div>
+    </>
   );
 }

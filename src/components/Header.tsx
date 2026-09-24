@@ -6,7 +6,11 @@ import Image from "next/image";
 import ThemeToggle from "./ThemeToggle";
 import styles from "./Header.module.css";
 
-export default function Header() {
+type HeaderProps = {
+  defaultQuery?: string;
+};
+
+export default function Header({ defaultQuery = "" }: HeaderProps) {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const mobileInputRef = useRef<HTMLInputElement>(null);
 
@@ -44,6 +48,7 @@ export default function Header() {
               id="header-search-input"
               type="search"
               name="query"
+              defaultValue={defaultQuery}
               placeholder="Pesquise por título ou autor..."
               className={styles.searchInput}
               required
@@ -111,6 +116,7 @@ export default function Header() {
               id="header-mobile-search-input"
               type="search"
               name="query"
+              defaultValue={defaultQuery}
               placeholder="Pesquise por título ou autor..."
               className={styles.mobileSearchInput}
               required
