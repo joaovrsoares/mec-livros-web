@@ -39,10 +39,25 @@ function LoadingContent() {
               {/* Featured Book Skeleton */}
               <div className={styles.heroSkeleton} />
 
-              {/* Chips Bar Skeleton */}
-              <div className={styles.chipsBarSkeleton} />
+              {/* Shelf Skeleton 1: Ficção Literária */}
+              <div className={styles.sliderContainer}>
+                <div className={styles.sliderHeader}>
+                  <div className={styles.titleSkeleton} style={{ width: 180, height: 24 }} />
+                </div>
+                <div className={styles.sliderTrack}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className={styles.sliderCardSkeleton}>
+                      <div className={styles.coverWrapSkeleton} />
+                      <div className={styles.cardBodySkeleton}>
+                        <div className={styles.titleSkeleton} />
+                        <div className={styles.authorSkeleton} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-              {/* Shelf Skeleton 1 */}
+              {/* Shelf Skeleton 2: Clássicos da Literatura */}
               <div className={styles.sliderContainer}>
                 <div className={styles.sliderHeader}>
                   <div className={styles.titleSkeleton} style={{ width: 220, height: 24 }} />
@@ -60,22 +75,11 @@ function LoadingContent() {
                 </div>
               </div>
 
-              {/* Shelf Skeleton 2 */}
-              <div className={styles.sliderContainer}>
-                <div className={styles.sliderHeader}>
-                  <div className={styles.inlineSelectSkeleton} />
-                </div>
-                <div className={styles.sliderTrack}>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <div key={index} className={styles.sliderCardSkeleton}>
-                      <div className={styles.coverWrapSkeleton} />
-                      <div className={styles.cardBodySkeleton}>
-                        <div className={styles.titleSkeleton} />
-                        <div className={styles.authorSkeleton} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              {/* All Categories Grid Skeleton */}
+              <div className={styles.categoryGridSkeleton}>
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <div key={index} className={styles.categoryCardSkeleton} />
+                ))}
               </div>
             </>
           )}
@@ -95,7 +99,6 @@ export default function Loading() {
           <div className={styles.page}>
             <main className={styles.main}>
               <div className={styles.heroSkeleton} />
-              <div className={styles.chipsBarSkeleton} />
             </main>
           </div>
           <Footer />

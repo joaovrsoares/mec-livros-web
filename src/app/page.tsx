@@ -13,16 +13,17 @@ import {
 import Pagination from "@/components/Pagination";
 import Header from "@/components/Header";
 import FeaturedBookHero from "@/components/FeaturedBookHero";
-import CategoryChipsBar from "@/components/CategoryChipsBar";
 import BookShelfSlider from "@/components/BookShelfSlider";
-import CategorySlider from "@/components/CategorySlider";
+import CategoryGrid from "@/components/CategoryGrid";
 import BookCard from "@/components/BookCard";
 import Footer from "@/components/Footer";
+
+// Force dynamic rendering so Math.random() selects a random featured book on every request
+export const dynamic = "force-dynamic";
 
 type HomeProps = {
   searchParams: Promise<{
     query?: string;
-    category?: string;
     page?: string;
   }>;
 };
@@ -65,7 +66,6 @@ function buildQueryHref(query: string, page: number): string {
 export default async function Home({ searchParams }: HomeProps) {
   const params = await searchParams;
   const query = params.query?.trim() ?? "";
-  const categoryParam = params.category?.trim() ?? "";
   const page = parsePage(params.page);
   const directBookId = query ? extractBookId(query) : null;
 
@@ -79,10 +79,9 @@ export default async function Home({ searchParams }: HomeProps) {
     categoriesData?.sections?.flatMap((section) => section.categories) ?? [];
 
   let searchResult: MecSearchResponse | null = null;
-  let categoryResult: MecCategoryBooksResponse | null = null;
-  let featuredBook: MecBook | null = null;
+  let fictionShelf: MecCategoryBooksResponse | null = null;
   let classicsShelf: MecCategoryBooksResponse | null = null;
-  let shortStoriesShelf: MecCategoryBooksResponse | null = null;
+  let featuredBook: MecBook | null = null;
   let errorMessage = "";
 
   if (query) {
@@ -95,28 +94,27 @@ export default async function Home({ searchParams }: HomeProps) {
           : "Não foi possível carregar os resultados da busca.";
     }
   } else {
-    // When no search query, fetch curated shelves in parallel
-    const selectedSlug = categoryParam || "ficcao-literaria";
-
-    const [
-      featuredResult,
-      activeCategoryResult,
-      classicsResult,
-      shortStoriesResult,
-    ] = await Promise.allSettled([
-      // Featured editorial book: Memórias Póstumas de Brás Cubas (300000233)
-      getBookById("300000233"),
-      getCategoryBooks({ slug: selectedSlug, page: 1, limit: 12 }),
-      getCategoryBooks({ slug: "classicos", page: 1, limit: 10 }),
-      getCategoryBooks({ slug: "contos-cronicas", page: 1, limit: 10 }),
+    // When no search query, fetch Ficção Literária and Clássicos da Literatura in parallel
+    const [fictionResult, classicsResult] = await Promise.allSettled([
+      getCategoryBooks({ slug: "ficcao-literaria", page: 1, limit: 12 }),
+      getCategoryBooks({ slug: "classicos", page: 1, limit: 12 }),
     ]);
 
-    if (featuredResult.status === "fulfilled") {
-      featuredBook = featuredResult.value;
-    }
+    if (fictionResult.status === "fulfilled") {
+      fictionShelf = fictionResult.value;
 
-    if (activeCategoryResult.status === "fulfilled") {
-      categoryResult = activeCategoryResult.value;
+      // Pick 1 book randomly from the Ficção Literária results for the Hero banner
+      if (fictionShelf.books && fictionShelf.books.length > 0) {
+        const randomIndex = Math.floor(Math.random() * fictionShelf.books.length);
+        const candidateBook = fictionShelf.books[randomIndex];
+
+        // Fetch full details if needed (to ensure complete synopsis and publisher)
+        try {
+          featuredBook = await getBookById(String(candidateBook.id));
+        } catch {
+          featuredBook = candidateBook;
+        }
+      }
     } else {
       errorMessage = "Não foi possível carregar as recomendações de livros.";
     }
@@ -124,13 +122,7 @@ export default async function Home({ searchParams }: HomeProps) {
     if (classicsResult.status === "fulfilled") {
       classicsShelf = classicsResult.value;
     }
-
-    if (shortStoriesResult.status === "fulfilled") {
-      shortStoriesShelf = shortStoriesResult.value;
-    }
   }
-
-  const activeCategorySlug = categoryParam || (categoryResult?.slug ?? "ficcao-literaria");
 
   return (
     <>
@@ -182,15 +174,23 @@ export default async function Home({ searchParams }: HomeProps) {
             </>
           )}
 
-          {/* Homepage Showcase (Curated Hero, Popular Chips & Multi-Shelves) */}
+          {/* Homepage Curated Showcase */}
           {!query && (
             <>
+              {/* Randomly chosen book from Ficção Literária */}
               {featuredBook && <FeaturedBookHero book={featuredBook} />}
 
-              {categoriesList.length > 0 && (
-                <CategoryChipsBar categories={categoriesList.slice(0, 8)} />
+              {/* Shelf 1: Ficção Literária */}
+              {fictionShelf && fictionShelf.books.length > 0 && (
+                <BookShelfSlider
+                  title="Ficção Literária"
+                  subtitle="Narrativas contemporâneas e obras consagradas"
+                  categorySlug="ficcao-literaria"
+                  books={fictionShelf.books}
+                />
               )}
 
+              {/* Shelf 2: Clássicos da Literatura */}
               {classicsShelf && classicsShelf.books.length > 0 && (
                 <BookShelfSlider
                   title="Clássicos da Literatura"
@@ -200,24 +200,9 @@ export default async function Home({ searchParams }: HomeProps) {
                 />
               )}
 
-              {/* Dynamic Interactive Category Slider with Dropdown */}
-              {categoryResult && categoryResult.books.length > 0 && (
-                <CategorySlider
-                  books={categoryResult.books}
-                  categorySlug={categoryResult.slug}
-                  categoryName={categoryResult.name}
-                  categories={categoriesList}
-                  activeSlug={activeCategorySlug}
-                />
-              )}
-
-              {shortStoriesShelf && shortStoriesShelf.books.length > 0 && (
-                <BookShelfSlider
-                  title="Contos e Crônicas"
-                  subtitle="Narrativas curtas e antologias de grandes autores"
-                  categorySlug="contos-cronicas"
-                  books={shortStoriesShelf.books}
-                />
+              {/* Grid with all categories dynamically from API */}
+              {categoriesList.length > 0 && (
+                <CategoryGrid categories={categoriesList} />
               )}
             </>
           )}

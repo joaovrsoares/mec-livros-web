@@ -1,0 +1,120 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.88rem;
+  color: var(--text-caption);
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  text-decoration: none;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.gradientBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, var(--gradient-from), var(--gradient-to));
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+  transition: width 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--primary);
+}
+
+.card:hover .gradientBar {
+  width: 7px;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 6px;
+  min-width: 0;
+}
+
+.categoryName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-heading);
+  line-height: 1.3;
+  transition: color 0.15s ease;
+}
+
+.card:hover .categoryName {
+  color: var(--primary);
+}
+
+.categoryCount {
+  font-size: 0.8rem;
+  color: var(--text-caption);
+}
+
+.arrowIcon {
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--text-caption);
+  transition: transform 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.card:hover .arrowIcon {
+  transform: translateX(3px);
+  color: var(--primary);
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .card {
+    padding: 14px 16px;
+  }
+}
