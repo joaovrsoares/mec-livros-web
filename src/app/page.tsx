@@ -4,14 +4,20 @@ import {
   searchBooks,
   getCategoriesPreview,
   getCategoryBooks,
+  getBookById,
   type MecSearchResponse,
   type MecCategory,
   type MecCategoryBooksResponse,
+  type MecBook,
 } from "@/lib/mec-api";
 import Pagination from "@/components/Pagination";
 import Header from "@/components/Header";
+import FeaturedBookHero from "@/components/FeaturedBookHero";
+import CategoryChipsBar from "@/components/CategoryChipsBar";
+import BookShelfSlider from "@/components/BookShelfSlider";
 import CategorySlider from "@/components/CategorySlider";
 import BookCard from "@/components/BookCard";
+import Footer from "@/components/Footer";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -74,6 +80,9 @@ export default async function Home({ searchParams }: HomeProps) {
 
   let searchResult: MecSearchResponse | null = null;
   let categoryResult: MecCategoryBooksResponse | null = null;
+  let featuredBook: MecBook | null = null;
+  let classicsShelf: MecCategoryBooksResponse | null = null;
+  let shortStoriesShelf: MecCategoryBooksResponse | null = null;
   let errorMessage = "";
 
   if (query) {
@@ -86,27 +95,38 @@ export default async function Home({ searchParams }: HomeProps) {
           : "Não foi possível carregar os resultados da busca.";
     }
   } else {
-    // Default to 'ficcao-literaria' if no category query param is passed
+    // When no search query, fetch curated shelves in parallel
     const selectedSlug = categoryParam || "ficcao-literaria";
-    try {
-      categoryResult = await getCategoryBooks({ slug: selectedSlug, page: 1, limit: 11 });
-    } catch (error) {
-      if (categoriesList.length > 0 && selectedSlug !== categoriesList[0].slug) {
-        try {
-          categoryResult = await getCategoryBooks({
-            slug: categoriesList[0].slug,
-            page: 1,
-            limit: 11,
-          });
-        } catch {
-          errorMessage = "Não foi possível carregar as recomendações de livros.";
-        }
-      } else {
-        errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Não foi possível carregar as recomendações de livros.";
-      }
+
+    const [
+      featuredResult,
+      activeCategoryResult,
+      classicsResult,
+      shortStoriesResult,
+    ] = await Promise.allSettled([
+      // Featured editorial book: Memórias Póstumas de Brás Cubas (300000233)
+      getBookById("300000233"),
+      getCategoryBooks({ slug: selectedSlug, page: 1, limit: 12 }),
+      getCategoryBooks({ slug: "classicos", page: 1, limit: 10 }),
+      getCategoryBooks({ slug: "contos-cronicas", page: 1, limit: 10 }),
+    ]);
+
+    if (featuredResult.status === "fulfilled") {
+      featuredBook = featuredResult.value;
+    }
+
+    if (activeCategoryResult.status === "fulfilled") {
+      categoryResult = activeCategoryResult.value;
+    } else {
+      errorMessage = "Não foi possível carregar as recomendações de livros.";
+    }
+
+    if (classicsResult.status === "fulfilled") {
+      classicsShelf = classicsResult.value;
+    }
+
+    if (shortStoriesResult.status === "fulfilled") {
+      shortStoriesShelf = shortStoriesResult.value;
     }
   }
 
@@ -162,18 +182,48 @@ export default async function Home({ searchParams }: HomeProps) {
             </>
           )}
 
-          {/* Home Recommendations (Category Slider of 12 books + Inline Dropdown) */}
-          {!query && categoryResult && categoryResult.books.length > 0 && (
-            <CategorySlider
-              books={categoryResult.books}
-              categorySlug={categoryResult.slug}
-              categoryName={categoryResult.name}
-              categories={categoriesList}
-              activeSlug={activeCategorySlug}
-            />
+          {/* Homepage Showcase (Curated Hero, Popular Chips & Multi-Shelves) */}
+          {!query && (
+            <>
+              {featuredBook && <FeaturedBookHero book={featuredBook} />}
+
+              {categoriesList.length > 0 && (
+                <CategoryChipsBar categories={categoriesList.slice(0, 8)} />
+              )}
+
+              {classicsShelf && classicsShelf.books.length > 0 && (
+                <BookShelfSlider
+                  title="Clássicos da Literatura"
+                  subtitle="Obras fundamentais em domínio público e livre acesso"
+                  categorySlug="classicos"
+                  books={classicsShelf.books}
+                />
+              )}
+
+              {/* Dynamic Interactive Category Slider with Dropdown */}
+              {categoryResult && categoryResult.books.length > 0 && (
+                <CategorySlider
+                  books={categoryResult.books}
+                  categorySlug={categoryResult.slug}
+                  categoryName={categoryResult.name}
+                  categories={categoriesList}
+                  activeSlug={activeCategorySlug}
+                />
+              )}
+
+              {shortStoriesShelf && shortStoriesShelf.books.length > 0 && (
+                <BookShelfSlider
+                  title="Contos e Crônicas"
+                  subtitle="Narrativas curtas e antologias de grandes autores"
+                  categorySlug="contos-cronicas"
+                  books={shortStoriesShelf.books}
+                />
+              )}
+            </>
           )}
         </main>
       </div>
+      <Footer />
     </>
   );
 }

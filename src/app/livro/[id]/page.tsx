@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import styles from "./page.module.css";
 import DownloadButton from "@/components/DownloadButton";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { formatLanguage, getBookById, getCoverUrl } from "@/lib/mec-api";
 
 type BookDetailsProps = {
@@ -105,6 +106,7 @@ export default async function BookDetailsPage({ params }: BookDetailsProps) {
         <p>{book.description || "Sem descrição disponível."}</p>
       </section>
     </main>
+    <Footer />
   </>
 );
 }

@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import styles from "./page.module.css";
 
 function LoadingContent() {
@@ -34,32 +35,53 @@ function LoadingContent() {
               </section>
             </>
           ) : (
-            <div className={styles.categoriesContainer}>
-              <div className={styles.sliderHeader}>
-                <div className={styles.sliderTitleWrapper}>
-                  <div className={styles.inlineSelectSkeleton} />
+            <>
+              {/* Featured Book Skeleton */}
+              <div className={styles.heroSkeleton} />
+
+              {/* Chips Bar Skeleton */}
+              <div className={styles.chipsBarSkeleton} />
+
+              {/* Shelf Skeleton 1 */}
+              <div className={styles.sliderContainer}>
+                <div className={styles.sliderHeader}>
+                  <div className={styles.titleSkeleton} style={{ width: 220, height: 24 }} />
                 </div>
-                <div className={styles.sliderControls}>
-                  <div className={styles.sliderArrowSkeleton} />
-                  <div className={styles.sliderArrowSkeleton} />
+                <div className={styles.sliderTrack}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className={styles.sliderCardSkeleton}>
+                      <div className={styles.coverWrapSkeleton} />
+                      <div className={styles.cardBodySkeleton}>
+                        <div className={styles.titleSkeleton} />
+                        <div className={styles.authorSkeleton} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className={styles.sliderTrack}>
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className={styles.sliderCardSkeleton}>
-                    <div className={styles.coverWrapSkeleton} />
-                    <div className={styles.cardBodySkeleton}>
-                      <div className={styles.titleSkeleton} />
-                      <div className={styles.authorSkeleton} />
+              {/* Shelf Skeleton 2 */}
+              <div className={styles.sliderContainer}>
+                <div className={styles.sliderHeader}>
+                  <div className={styles.inlineSelectSkeleton} />
+                </div>
+                <div className={styles.sliderTrack}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className={styles.sliderCardSkeleton}>
+                      <div className={styles.coverWrapSkeleton} />
+                      <div className={styles.cardBodySkeleton}>
+                        <div className={styles.titleSkeleton} />
+                        <div className={styles.authorSkeleton} />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </main>
       </div>
+      <Footer />
     </>
   );
 }
@@ -72,22 +94,11 @@ export default function Loading() {
           <Header />
           <div className={styles.page}>
             <main className={styles.main}>
-              <div className={styles.categoriesContainer}>
-                <div className={styles.sliderHeader}>
-                  <div className={styles.sliderTitleWrapper}>
-                    <div className={styles.inlineSelectSkeleton} />
-                  </div>
-                </div>
-                <div className={styles.sliderTrack}>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <div key={index} className={styles.sliderCardSkeleton}>
-                      <div className={styles.coverWrapSkeleton} />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <div className={styles.heroSkeleton} />
+              <div className={styles.chipsBarSkeleton} />
             </main>
           </div>
+          <Footer />
         </>
       }
     >

@@ -5,6 +5,7 @@ import { getCategoryBooks } from "@/lib/mec-api";
 import BookCard from "@/components/BookCard";
 import Header from "@/components/Header";
 import Pagination from "@/components/Pagination";
+import Footer from "@/components/Footer";
 
 type CategoryPageProps = {
   params: Promise<{
@@ -66,6 +67,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           />
         </main>
       </div>
+      <Footer />
     </>
   );
 }
