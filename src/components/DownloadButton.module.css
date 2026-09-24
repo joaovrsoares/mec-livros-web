@@ -32,9 +32,18 @@
   box-shadow: 0 1px 4px rgba(19, 81, 180, 0.14);
 }
 
+.splitGroupRounded {
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(19, 81, 180, 0.25);
+}
+
 .splitGroup:hover:not(.disabledGroup) {
   background-color: #0d47a1;
   box-shadow: 0 4px 10px rgba(19, 81, 180, 0.25);
+}
+
+.splitGroupRounded:hover:not(.disabledGroup) {
+  box-shadow: 0 4px 12px rgba(19, 81, 180, 0.35);
 }
 
 .splitGroup:active:not(.disabledGroup) {
@@ -67,6 +76,12 @@
   white-space: nowrap;
   user-select: none;
   transition: background-color 0.15s ease;
+}
+
+.mainBtnRounded {
+  border-radius: 999px 0 0 999px;
+  padding-left: 22px;
+  padding-right: 18px;
 }
 
 .mainBtnCard {
@@ -111,6 +126,15 @@
   outline: none;
   user-select: none;
   transition: background-color 0.15s ease;
+}
+
+.arrowBtnRounded {
+  border-radius: 0 999px 999px 0;
+  padding-right: 6px;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  flex: 0 0 40px;
 }
 
 .arrowBtnCard {

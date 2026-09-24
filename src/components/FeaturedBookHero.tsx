@@ -53,15 +53,16 @@ export default function FeaturedBookHero({ book }: FeaturedBookHeroProps) {
           )}
 
           <div className={styles.actions}>
-            <Link href={`/livro/${book.id}`} className={styles.primaryBtn}>
-              Detalhes
-            </Link>
             <DownloadButton
               bookId={book.id}
               bookTitle={book.title}
               bookAuthors={book.authors}
               hasEpub={book.has_epub ?? true}
+              variant="rounded"
             />
+            <Link href={`/livro/${book.id}`} className={styles.secondaryBtn}>
+              Detalhes
+            </Link>
           </div>
         </div>
       </div>

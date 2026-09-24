@@ -8,7 +8,7 @@ type DownloadButtonProps = {
   bookTitle: string;
   bookAuthors?: string[];
   hasEpub?: boolean;
-  variant?: "default" | "card";
+  variant?: "default" | "card" | "rounded";
 };
 
 type DownloadType = "epub" | "pdf";
@@ -18,7 +18,7 @@ export default function DownloadButton({
   bookTitle,
   bookAuthors = [],
   hasEpub = true,
-  variant = "default",
+  variant = "rounded",
 }: DownloadButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loadingType, setLoadingType] = useState<DownloadType | null>(null);
@@ -185,8 +185,13 @@ export default function DownloadButton({
       onClick={(e) => e.stopPropagation()}
     >
       <div
-        className={`${styles.splitGroup} ${variant === "card" ? styles.splitGroupCard : ""
-          } ${isAnyLoading || countdown > 0 ? styles.disabledGroup : ""}`}
+        className={`${styles.splitGroup} ${
+          variant === "card"
+            ? styles.splitGroupCard
+            : variant === "rounded"
+            ? styles.splitGroupRounded
+            : ""
+        } ${isAnyLoading || countdown > 0 ? styles.disabledGroup : ""}`}
       >
         <button
           type="button"
@@ -195,7 +200,13 @@ export default function DownloadButton({
             handleDownload("pdf");
           }}
           disabled={isAnyLoading || countdown > 0}
-          className={`${styles.mainBtn} ${variant === "card" ? styles.mainBtnCard : ""}`}
+          className={`${styles.mainBtn} ${
+            variant === "card"
+              ? styles.mainBtnCard
+              : variant === "rounded"
+              ? styles.mainBtnRounded
+              : ""
+          }`}
           title="Baixar em formato PDF"
           aria-label="Baixar em PDF"
           aria-busy={loadingType === "pdf"}
@@ -221,8 +232,13 @@ export default function DownloadButton({
             setIsOpen((prev) => !prev);
           }}
           disabled={isAnyLoading || countdown > 0}
-          className={`${styles.arrowBtn} ${variant === "card" ? styles.arrowBtnCard : ""} ${isOpen ? styles.arrowBtnActive : ""
-            }`}
+          className={`${styles.arrowBtn} ${
+            variant === "card"
+              ? styles.arrowBtnCard
+              : variant === "rounded"
+              ? styles.arrowBtnRounded
+              : ""
+          } ${isOpen ? styles.arrowBtnActive : ""}`}
           aria-haspopup="true"
           aria-expanded={isOpen}
           aria-label="Escolher formato de download"
