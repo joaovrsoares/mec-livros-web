@@ -46,9 +46,7 @@ export default function FeaturedBookHero({ book }: FeaturedBookHeroProps) {
 
           {book.description && (
             <p className={styles.description}>
-              {book.description.length > 240
-                ? `${book.description.slice(0, 240).trim()}...`
-                : book.description}
+              {book.description}
             </p>
           )}
 
