@@ -15,52 +15,48 @@ export default function FeaturedBookHero({ book }: FeaturedBookHeroProps) {
     <section className={styles.heroSection} aria-label="Livro em destaque">
       <div className={styles.heroBackdrop} />
       <div className={styles.heroContent}>
-        <div className={styles.coverWrapper}>
-          <Link href={`/livro/${book.id}`} className={styles.coverLink} tabIndex={-1} aria-hidden="true">
-            <Image
-              src={book.cover_filename}
-              alt=""
-              width={160}
-              height={240}
-              priority
-              className={styles.coverImage}
-            />
-          </Link>
+        <div className={styles.badgeRow}>
+          <span className={styles.badge}>Obra em Destaque</span>
         </div>
 
-        <div className={styles.infoWrapper}>
-          <div className={styles.badgeRow}>
-            <span className={styles.badge}>Obra em Destaque</span>
-            {book.categories && book.categories.length > 0 && (
-              <span className={styles.categoryBadge}>{book.categories[0]}</span>
-            )}
+        <div className={styles.heroMain}>
+          <div className={styles.coverWrapper}>
+            <Link href={`/livro/${book.id}`} className={styles.coverLink} tabIndex={-1} aria-hidden="true">
+              <Image
+                src={book.cover_filename}
+                alt=""
+                width={160}
+                height={240}
+                priority
+                className={styles.coverImage}
+              />
+            </Link>
           </div>
 
-          <h2 className={styles.title}>
-            <Link href={`/livro/${book.id}`} className={styles.titleLink}>
-              {book.title}
-            </Link>
-          </h2>
+          <div className={styles.infoWrapper}>
+            <h2 className={styles.title}>
+              <Link href={`/livro/${book.id}`} className={styles.titleLink}>
+                {book.title}
+              </Link>
+            </h2>
 
-          <p className={styles.author}>por {authors}</p>
+            <p className={styles.author}>por {authors}</p>
 
-          {book.description && (
-            <p className={styles.description}>
-              {book.description}
-            </p>
-          )}
+            {book.description && (
+              <p className={styles.description}>
+                {book.description}
+              </p>
+            )}
 
-          <div className={styles.actions}>
-            <DownloadButton
-              bookId={book.id}
-              bookTitle={book.title}
-              bookAuthors={book.authors}
-              hasEpub={book.has_epub ?? true}
-              variant="rounded"
-            />
-            <Link href={`/livro/${book.id}`} className={styles.secondaryBtn}>
-              Detalhes
-            </Link>
+            <div className={styles.actions}>
+              <DownloadButton
+                bookId={book.id}
+                bookTitle={book.title}
+                bookAuthors={book.authors}
+                hasEpub={book.has_epub ?? true}
+                variant="rounded"
+              />
+            </div>
           </div>
         </div>
       </div>

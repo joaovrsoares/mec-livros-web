@@ -108,6 +108,15 @@
   color: var(--primary);
 }
 
+.gridContainer {
+  position: relative;
+  width: 100%;
+}
+
+.blurOverlay {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: 1fr;
@@ -116,5 +125,77 @@
 
   .card {
     padding: 14px 16px;
+  }
+
+  .gridCollapsed .mobileHiddenCard {
+    display: none !important;
+  }
+
+  .gridCollapsed {
+    position: relative;
+  }
+
+  .blurOverlay {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 140px;
+    background: linear-gradient(
+      180deg,
+      rgba(247, 248, 251, 0) 0%,
+      rgba(247, 248, 251, 0.75) 45%,
+      rgba(247, 248, 251, 0.98) 85%,
+      var(--bg-page) 100%
+    );
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    padding-bottom: 8px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  [data-theme="dark"] .blurOverlay {
+    background: linear-gradient(
+      180deg,
+      rgba(15, 19, 26, 0) 0%,
+      rgba(15, 19, 26, 0.75) 45%,
+      rgba(15, 19, 26, 0.98) 85%,
+      var(--bg-page) 100%
+    );
+  }
+
+  .expandButton {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: var(--bg-surface);
+    color: var(--primary);
+    border: 1px solid var(--border-subtle);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .expandButton:hover {
+    background: var(--bg-subtle);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  }
+
+  .expandButton:active {
+    transform: translateY(1px);
+  }
+
+  .expandIcon {
+    transition: transform 0.2s ease;
   }
 }

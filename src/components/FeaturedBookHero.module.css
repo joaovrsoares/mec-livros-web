@@ -27,10 +27,17 @@
   position: relative;
   z-index: 1;
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 30px 36px;
+  box-sizing: border-box;
+}
+
+.heroMain {
+  display: flex;
   align-items: center;
   gap: 36px;
-  padding: 32px 36px;
-  box-sizing: border-box;
+  width: 100%;
 }
 
 .coverWrapper {
@@ -70,7 +77,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  align-self: flex-start;
 }
 
 .badge {
@@ -84,18 +91,6 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-.categoryBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--bg-subtle);
-  color: var(--primary);
-  font-size: 0.78rem;
-  font-weight: 600;
-  border: 1px solid var(--border-subtle);
 }
 
 .title {
@@ -143,44 +138,6 @@
   margin-top: 6px;
 }
 
-.secondaryBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 24px;
-  height: 44px;
-  border-radius: 999px;
-  background: var(--bg-page);
-  color: var(--text-heading);
-  border: 1px solid var(--border-subtle);
-  font-size: 0.94rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.15s ease;
-  box-sizing: border-box;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="dark"] .secondaryBtn {
-  background: var(--bg-subtle);
-  color: var(--text-heading);
-  border: 1px solid var(--border-subtle);
-}
-
-.secondaryBtn:hover {
-  background: var(--bg-subtle);
-  color: var(--primary);
-  border-color: var(--primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-[data-theme="dark"] .secondaryBtn:hover {
-  background: var(--border-subtle);
-  color: #ffffff;
-  border-color: var(--border-focus);
-}
-
 @media (max-width: 768px) {
   .heroSection {
     border-radius: 16px;
@@ -193,18 +150,37 @@
   }
 
   .heroContent {
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
-    text-align: left;
-    gap: 16px;
+    gap: 10px;
     padding: 16px;
     max-height: 50vh;
     box-sizing: border-box;
   }
 
+  .badgeRow {
+    align-self: flex-start;
+  }
+
+  .badge {
+    padding: 2px 8px;
+    font-size: 0.7rem;
+  }
+
+  .heroMain {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 14px;
+    width: 100%;
+    min-height: 0;
+  }
+
   .coverWrapper {
     flex-shrink: 0;
-    align-self: flex-start;
+    align-self: center;
+    display: flex;
+    align-items: center;
   }
 
   .coverLink {
@@ -224,27 +200,11 @@
     gap: 6px;
     min-width: 0;
     flex: 1;
-    height: 100%;
-    justify-content: flex-start;
-  }
-
-  .badgeRow {
-    justify-content: flex-start;
-    gap: 6px;
-  }
-
-  .badge {
-    padding: 2px 8px;
-    font-size: 0.7rem;
-  }
-
-  .categoryBadge {
-    padding: 2px 8px;
-    font-size: 0.7rem;
+    justify-content: center;
   }
 
   .title {
-    font-size: 1.15rem;
+    font-size: 1.12rem;
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -275,12 +235,6 @@
   .actions {
     justify-content: flex-start;
     gap: 8px;
-    margin-top: 4px;
-  }
-
-  .secondaryBtn {
-    height: 38px;
-    padding: 0 16px;
-    font-size: 0.85rem;
+    margin-top: 2px;
   }
 }
