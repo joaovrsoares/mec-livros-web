@@ -15,10 +15,6 @@ export default function FeaturedBookHero({ book }: FeaturedBookHeroProps) {
     <section className={styles.heroSection} aria-label="Livro em destaque">
       <div className={styles.heroBackdrop} />
       <div className={styles.heroContent}>
-        <div className={styles.badgeRow}>
-          <span className={styles.badge}>Obra em Destaque</span>
-        </div>
-
         <div className={styles.heroMain}>
           <div className={styles.coverWrapper}>
             <Link href={`/livro/${book.id}`} className={styles.coverLink} tabIndex={-1} aria-hidden="true">

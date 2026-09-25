@@ -73,26 +73,6 @@
   min-width: 0;
 }
 
-.badgeRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  align-self: flex-start;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--primary);
-  color: var(--primary-contrast);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .title {
   margin: 0;
   font-size: 1.75rem;
@@ -156,15 +136,6 @@
     padding: 16px;
     max-height: 50vh;
     box-sizing: border-box;
-  }
-
-  .badgeRow {
-    align-self: flex-start;
-  }
-
-  .badge {
-    padding: 2px 8px;
-    font-size: 0.7rem;
   }
 
   .heroMain {
