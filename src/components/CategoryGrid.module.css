@@ -59,14 +59,20 @@
   transition: width 0.2s ease;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--card-shadow-hover);
-  border-color: var(--primary);
-}
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+  }
 
-.card:hover .gradientBar {
-  width: 7px;
+  .card:hover .gradientBar {
+    width: 7px;
+  }
+
+  .card:hover .arrowIcon {
+    transform: translateX(3px);
+    color: var(--primary);
+  }
 }
 
 .cardContent {
@@ -82,11 +88,6 @@
   font-weight: 600;
   color: var(--text-heading);
   line-height: 1.3;
-  transition: color 0.15s ease;
-}
-
-.card:hover .categoryName {
-  color: var(--primary);
 }
 
 .categoryCount {
@@ -101,11 +102,6 @@
   transition: transform 0.15s ease, color 0.15s ease;
   flex-shrink: 0;
   margin-left: 8px;
-}
-
-.card:hover .arrowIcon {
-  transform: translateX(3px);
-  color: var(--primary);
 }
 
 .gridContainer {

@@ -19,8 +19,8 @@
   --primary-hover: #0d47a1;
   --primary-contrast: #ffffff;
 
-  --card-shadow: 0 1px 4px rgba(19, 81, 180, 0.04);
-  --card-shadow-hover: 0 6px 20px rgba(19, 81, 180, 0.1);
+  --card-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  --card-shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.08);
   --dropdown-bg: #ffffff;
   --dropdown-border: #e3e9f6;
   --menu-hover: #f0f5ff;
@@ -111,6 +111,7 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {

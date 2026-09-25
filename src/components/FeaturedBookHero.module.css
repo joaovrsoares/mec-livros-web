@@ -52,9 +52,11 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.coverLink:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+@media (hover: hover) {
+  .coverLink:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+  }
 }
 
 .coverImage {
@@ -87,8 +89,10 @@
   transition: color 0.15s ease;
 }
 
-.titleLink:hover {
-  color: var(--primary);
+@media (hover: hover) {
+  .titleLink:hover {
+    color: var(--primary);
+  }
 }
 
 .author {

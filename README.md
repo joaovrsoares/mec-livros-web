@@ -7,11 +7,11 @@ Aplicação web desenvolvida em [Next.js](https://nextjs.org) (App Router com Ty
 ## 🚀 Funcionalidades
 
 - **Busca e Paginação de Livros**: Busca por título, autor, URL ou ID com paginação em grade responsiva (12 itens por página).
-- **Otimização e Proxy de Capas**: Servidor proxy (`/api/cover-proxy`) que detecta os *magic bytes* das imagens (incluindo imagens AVIF/PNG salvas com extensão `.jpg`), convertendo e padronizando em WebP de alta qualidade através da biblioteca `sharp`.
-- **Pré-carregamento em Memória**: Pré-carregamento das capas no servidor durante a busca para renderização instantânea no navegador sem blocos em branco.
+- **Padronização de Capas WebP em Alta Definição**: Normalização inteligente das URLs de capas para a CDN oficial do MEC em formato WebP (`/covers-webp/`), garantindo imagens nítidas e otimizadas sem overhead de processamento no servidor.
+- **Cache em Memória & Concorrência Controlada**: Cache em memória das consultas de detalhes e execução concorrente limitada para enriquecimento de metadados sem sobrecarregar a API upstream.
 - **Skeleton Screens & Layout Responsivo**: Interface com animação Shimmer em esqueletos de carregamento sem saltos de layout (*Cumulative Layout Shift*).
 - **Download de EPUB Descriptografado**: Endpoint interno (`/api/books/[id]/download-decrypted`) que efetua o download do EPUB criptografado, descriptografa o conteúdo via AES-256 e entrega o arquivo `.epub` pronto para leitura.
-- **Conversão de EPUB para PDF (A4)**: Endpoint interno (`/api/books/[id]/download-pdf`) que renderiza e converte o EPUB descriptografado diretamente para documento PDF formatado.
+- **Conversão de EPUB para PDF (A4)**: Endpoint interno (`/api/books/[id]/download-pdf`) que renderiza e converte o EPUB descriptografado diretamente para documento PDF formatado com Chromium/Puppeteer e injeção de sumário/paginação via `pdf-lib`.
 - **Proteção Antiabuso (Rate Limiting)**: Limitador de requisições por cliente (IP) com janela de tempo curta e limite diário configurável.
 
 ---
@@ -90,14 +90,16 @@ docker run -p 3000:3000 --env-file .env.local mec-livros-web
 ├── public/                 # Assets estáticos (logos, favicons)
 ├── src/
 │   ├── app/
-│   │   ├── api/            # Route Handlers (cover-proxy, books, health)
+│   │   ├── api/            # Route Handlers (books, download, health)
+│   │   ├── categoria/[slug]# Listagem de livros por categoria
 │   │   ├── livro/[id]/     # Página de detalhes do livro
-│   │   ├── layout.tsx      # Layout principal
+│   │   ├── layout.tsx      # Layout principal e suporte a tema
 │   │   ├── loading.tsx     # Skeleton screen de carregamento
+│   │   ├── robots.ts       # Regras de SEO e bloqueio de scrapers IA
 │   │   └── page.tsx        # Página inicial e busca
-│   ├── components/         # Componentes React (DownloadButton, etc.)
-│   └── lib/                # Lógicas e utilitários (sharp, AES-256, EPUB to PDF, API MEC)
-└── next.config.ts          # Configurações do Next.js e localPatterns
+│   ├── components/         # Componentes React (FeaturedBookHero, DownloadButton, etc.)
+│   └── lib/                # Lógicas e utilitários (AES-256, EPUB to PDF, API MEC, Rate Limit)
+└── next.config.ts          # Configurações do Next.js
 ```
 
 ---
@@ -105,4 +107,5 @@ docker run -p 3000:3000 --env-file .env.local mec-livros-web
 ## 🔒 Segurança
 
 - **Credenciais**: Nunca comite o arquivo `.env.local` ou credenciais privadas no repositório.
-- **SSRF Protection**: O proxy de imagem valida os domínios permitidos (`static-meclivros.mec.gov.br`).
+- **Proteção Antiabuso**: Rate limiting por IP com verificação de proxies reversos (`x-forwarded-for` e `x-real-ip`).
+- **Bloqueio de Scrapers**: `robots.txt` configurado para bloquear bots invasivos de IA enquanto permite rastreadores legítimos.

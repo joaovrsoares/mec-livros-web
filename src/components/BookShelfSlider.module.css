@@ -74,10 +74,12 @@
   transition: all 0.2s ease;
 }
 
-.arrowBtn:hover {
-  background: var(--primary);
-  color: var(--primary-contrast);
-  border-color: var(--primary);
+@media (hover: hover) {
+  .arrowBtn:hover {
+    background: var(--bg-subtle);
+    color: var(--text-heading);
+    border-color: var(--border-input);
+  }
 }
 
 .shelfTrack {
@@ -109,12 +111,6 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.shelfCard:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--card-shadow-hover);
-  border-color: var(--primary);
-}
-
 .coverLink {
   display: block;
   text-decoration: none;
@@ -135,8 +131,15 @@
   transition: transform 0.2s ease;
 }
 
-.shelfCard:hover .cover {
-  transform: scale(1.03);
+@media (hover: hover) {
+  .shelfCard:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  .shelfCard:hover .cover {
+    transform: scale(1.03);
+  }
 }
 
 .cardInfo {
@@ -166,8 +169,10 @@
   transition: color 0.15s ease;
 }
 
-.cardLink:hover {
-  color: var(--primary);
+@media (hover: hover) {
+  .cardLink:hover {
+    color: var(--primary);
+  }
 }
 
 .cardAuthor {

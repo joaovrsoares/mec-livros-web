@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "npx tsx --test src/lib/*.test.ts"
+    "test": "npx tsx --test \"src/lib/**/*.test.ts\""
   },
   "dependencies": {
     "jszip": "^3.10.1",

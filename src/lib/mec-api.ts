@@ -97,6 +97,51 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
+async function mapConcurrent<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let currentIndex = 0;
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (currentIndex < items.length) {
+      const idx = currentIndex++;
+      results[idx] = await fn(items[idx]);
+    }
+  });
+
+  await Promise.all(workers);
+  return results;
+}
+
+async function enrichBook(book: MecBook): Promise<MecBook> {
+  let publisher = book.publisher?.trim();
+  let pageCount = book.page_count;
+
+  if (!publisher) {
+    try {
+      const detail = await getBookById(String(book.id));
+      if (detail?.publisher) {
+        publisher = detail.publisher;
+      }
+      if (!pageCount && detail?.page_count) {
+        pageCount = detail.page_count;
+      }
+    } catch {
+      // Keep original values if detail call fails
+    }
+  }
+
+  return {
+    ...book,
+    cover_filename: getCoverUrl(book.cover_filename),
+    publisher,
+    page_count: pageCount,
+  };
+}
+
 export async function searchBooks(params: {
   query: string;
   page: number;
@@ -113,33 +158,7 @@ export async function searchBooks(params: {
   );
 
   if (res.books) {
-    res.books = await Promise.all(
-      res.books.map(async (book) => {
-        let publisher = book.publisher?.trim();
-        let pageCount = book.page_count;
-
-        if (!publisher) {
-          try {
-            const detail = await getBookById(String(book.id));
-            if (detail?.publisher) {
-              publisher = detail.publisher;
-            }
-            if (!pageCount && detail?.page_count) {
-              pageCount = detail.page_count;
-            }
-          } catch {
-            // Keep original values if detail call fails
-          }
-        }
-
-        return {
-          ...book,
-          cover_filename: getCoverUrl(book.cover_filename),
-          publisher,
-          page_count: pageCount,
-        };
-      }),
-    );
+    res.books = await mapConcurrent(res.books, 4, enrichBook);
   }
 
   return res;
@@ -150,6 +169,7 @@ export async function getCategoriesPreview(): Promise<MecCategoriesPreviewRespon
 }
 
 const bookCache = new Map<string, { book: MecBook; timestamp: number }>();
+const inFlightRequests = new Map<string, Promise<MecBook>>();
 const BOOK_CACHE_TTL = 1000 * 60 * 15; // 15 minutes
 
 export async function getBookById(id: string): Promise<MecBook> {
@@ -157,14 +177,29 @@ export async function getBookById(id: string): Promise<MecBook> {
   if (cached && Date.now() - cached.timestamp < BOOK_CACHE_TTL) {
     return cached.book;
   }
-  const book = await fetchJson<MecBook>(`${PUBLIC_API_BASE}/books/${id}`);
-  if (book && book.cover_filename) {
-    book.cover_filename = getCoverUrl(book.cover_filename);
+
+  const existingPromise = inFlightRequests.get(id);
+  if (existingPromise) {
+    return existingPromise;
   }
-  if (book) {
-    bookCache.set(id, { book, timestamp: Date.now() });
-  }
-  return book;
+
+  const fetchPromise = (async () => {
+    try {
+      const book = await fetchJson<MecBook>(`${PUBLIC_API_BASE}/books/${id}`);
+      if (book && book.cover_filename) {
+        book.cover_filename = getCoverUrl(book.cover_filename);
+      }
+      if (book) {
+        bookCache.set(id, { book, timestamp: Date.now() });
+      }
+      return book;
+    } finally {
+      inFlightRequests.delete(id);
+    }
+  })();
+
+  inFlightRequests.set(id, fetchPromise);
+  return fetchPromise;
 }
 
 export async function getCategoryBooks(params: {
@@ -182,33 +217,7 @@ export async function getCategoryBooks(params: {
   );
 
   if (res.books) {
-    res.books = await Promise.all(
-      res.books.map(async (book) => {
-        let publisher = book.publisher;
-        let pageCount = book.page_count;
-
-        if (!publisher) {
-          try {
-            const detail = await getBookById(String(book.id));
-            if (detail?.publisher) {
-              publisher = detail.publisher;
-            }
-            if (!pageCount && detail?.page_count) {
-              pageCount = detail.page_count;
-            }
-          } catch {
-            // Keep original values if detail call fails
-          }
-        }
-
-        return {
-          ...book,
-          cover_filename: getCoverUrl(book.cover_filename),
-          publisher,
-          page_count: pageCount,
-        };
-      }),
-    );
+    res.books = await mapConcurrent(res.books, 4, enrichBook);
   }
 
   return res;

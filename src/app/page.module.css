@@ -172,13 +172,15 @@
   z-index: 40;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(19, 81, 180, 0.1);
-  border-color: #b9cdf4;
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+  }
 }
 
 .cardCoverWrap {
+  display: block;
   position: relative;
   width: 130px;
   min-width: 130px;
@@ -254,8 +256,10 @@
   transition: color 0.15s ease;
 }
 
-.card:hover .cardTitle {
-  color: var(--primary);
+@media (hover: hover) {
+  .card:hover .cardTitle {
+    color: var(--primary);
+  }
 }
 
 .cardAuthor {
@@ -305,8 +309,10 @@
   display: block;
 }
 
-.cardTitleLink:hover .cardTitle {
-  color: #1351b4;
+@media (hover: hover) {
+  .cardTitleLink:hover .cardTitle {
+    color: var(--primary);
+  }
 }
 
 .cardActions {
@@ -394,9 +400,12 @@
   transition: all 0.15s ease;
 }
 
-.pageButton:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+@media (hover: hover) {
+  .pageButton:hover:not(.pageButtonActive) {
+    border-color: var(--border-input);
+    background: var(--bg-subtle);
+    color: var(--text-heading);
+  }
 }
 
 .pageButton:focus-visible {
@@ -731,10 +740,12 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.categoryChip:hover {
-  border-color: #1351b4;
-  color: #1351b4;
-  background: #f0f5ff;
+@media (hover: hover) {
+  .categoryChip:hover:not(.categoryChipActive) {
+    border-color: var(--border-input);
+    color: var(--text-heading);
+    background: var(--bg-subtle);
+  }
 }
 
 .categoryChipActive {
@@ -795,10 +806,16 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.categorySelect:focus,
-.categorySelect:hover {
-  border-color: #1351b4;
-  box-shadow: 0 4px 12px rgba(19, 81, 180, 0.12);
+.categorySelect:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+@media (hover: hover) {
+  .categorySelect:hover {
+    border-color: var(--border-input);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
 }
 
 /* Category Slider */
@@ -846,10 +863,15 @@
   transition: all 0.2s ease;
 }
 
-.inlineCategorySelect:hover,
 .inlineCategorySelect:focus {
-  border-color: var(--primary);
-  background: var(--menu-hover);
+  border-color: var(--border-focus);
+}
+
+@media (hover: hover) {
+  .inlineCategorySelect:hover {
+    border-color: var(--border-input);
+    background: var(--menu-hover);
+  }
 }
 
 .selectPending {
@@ -890,10 +912,12 @@
   transition: all 0.2s;
 }
 
-.sliderArrow:hover {
-  background: var(--primary);
-  color: var(--primary-contrast);
-  border-color: var(--primary);
+@media (hover: hover) {
+  .sliderArrow:hover {
+    background: var(--bg-subtle);
+    color: var(--text-heading);
+    border-color: var(--border-input);
+  }
 }
 
 .sliderTrack {
@@ -950,11 +974,12 @@
   transition: all 0.2s ease;
 }
 
-.sliderSeeMoreCard:hover {
-  background: var(--menu-hover);
-  border-color: var(--primary);
-  transform: translateY(-4px);
-  box-shadow: var(--card-shadow-hover);
+@media (hover: hover) {
+  .sliderSeeMoreCard:hover {
+    background: var(--menu-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+  }
 }
 
 .seeMoreIcon {

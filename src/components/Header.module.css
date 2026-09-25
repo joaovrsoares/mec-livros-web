@@ -107,14 +107,16 @@
   flex-shrink: 0;
 }
 
-.iconButton:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--bg-subtle);
+@media (hover: hover) {
+  .iconButton:hover {
+    border-color: var(--border-input);
+    color: var(--text-heading);
+    background: var(--bg-subtle);
+  }
 }
 
 .iconButton:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
