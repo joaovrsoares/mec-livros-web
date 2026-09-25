@@ -1,27 +1,13 @@
 import Link from "next/link";
 import styles from "./Footer.module.css";
-import { getCategoriesPreview } from "@/lib/mec-api";
 
 type FooterProps = {
   totalBooks?: number;
 };
 
-export default async function Footer({ totalBooks }: FooterProps) {
+export default function Footer({ totalBooks }: FooterProps) {
   const currentYear = new Date().getFullYear();
-
-  let bookCount = totalBooks;
-  if (!bookCount || bookCount <= 0) {
-    try {
-      const data = await getCategoriesPreview();
-      if (data?.total_books && data.total_books > 0) {
-        bookCount = data.total_books;
-      }
-    } catch {
-      // Fallback
-    }
-  }
-
-  const formattedCount = bookCount && bookCount > 0 ? bookCount.toLocaleString("pt-BR") : null;
+  const formattedCount = totalBooks && totalBooks > 0 ? totalBooks.toLocaleString("pt-BR") : null;
 
   return (
     <footer className={styles.footer}>
